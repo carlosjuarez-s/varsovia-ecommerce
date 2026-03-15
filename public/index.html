@@ -1032,6 +1032,128 @@
       .checkout-order-summary { position: static; }
     }
 
+    /* ─── Hero Carousel ────────────────────────────────── */
+    .hero-carousel {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 0 0 24px 24px;
+    }
+    .hero-carousel .slides {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    .hero-carousel .slide {
+      min-width: 100%;
+      position: relative;
+      height: 360px;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-carousel .slide-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,45,120,0.7), rgba(230,0,92,0.5));
+    }
+    .hero-carousel .slide-content {
+      position: relative; z-index: 2;
+      text-align: center; color: #fff;
+      padding: 2rem;
+    }
+    .hero-carousel .slide-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; margin-bottom: 0.5rem;
+    }
+    .hero-carousel .slide-content p {
+      font-size: 1rem; opacity: 0.95; margin-bottom: 1rem;
+    }
+    .carousel-dots {
+      position: absolute; bottom: 16px; left: 50%;
+      transform: translateX(-50%); display: flex; gap: 8px; z-index: 3;
+    }
+    .carousel-dots .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(255,255,255,0.5); cursor: pointer;
+      transition: background 0.3s;
+    }
+    .carousel-dots .dot.active { background: #fff; }
+    .carousel-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 3; background: rgba(255,255,255,0.3); border: none;
+      color: #fff; font-size: 1.5rem; width: 40px; height: 40px;
+      border-radius: 50%; cursor: pointer; transition: background 0.2s;
+    }
+    .carousel-btn:hover { background: rgba(255,255,255,0.5); }
+    .carousel-btn.prev { left: 12px; }
+    .carousel-btn.next { right: 12px; }
+
+    /* ─── Varsovia Girl Section ──────────────────────────── */
+    .varsovia-girl-page {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    .vg-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
+      color: #fff;
+      padding: 0.4rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .vg-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--neutral-900);
+      margin-bottom: 0.75rem;
+    }
+    .vg-subtitle {
+      color: var(--neutral-600);
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .vg-perks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    .vg-perk {
+      background: #fff;
+      border: 1px solid var(--pink-100);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+    .vg-perk-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .vg-perk h4 { font-size: 0.85rem; color: var(--neutral-900); margin-bottom: 0.25rem; }
+    .vg-perk p { font-size: 0.75rem; color: var(--neutral-600); }
+    .vg-form {
+      background: #fff;
+      border: 1px solid var(--pink-100);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: left;
+    }
+    .vg-form .form-group { margin-bottom: 1rem; }
+    .vg-form label {
+      display: block; font-size: 0.72rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--neutral-600); margin-bottom: 0.3rem;
+    }
+    .vg-form input {
+      width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--neutral-200);
+      border-radius: 8px; font-size: 0.9rem; transition: border-color 0.2s;
+    }
+    .vg-form input:focus { outline: none; border-color: var(--pink-400); }
+
     @media (max-width: 640px) {
       header { padding: 0.8rem 1rem; }
       .hero { padding: 3rem 1.5rem 2.5rem; }
@@ -1042,6 +1164,9 @@
       nav a:not(.nav-cart) { display: none; }
       .cart-drawer { width: 100%; max-width: 100vw; }
       .checkout-page { padding: 1rem; }
+      .hero-carousel .slide { height: 240px; }
+      .hero-carousel .slide-content h2 { font-size: 1.5rem; }
+      .vg-perks { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -1065,18 +1190,38 @@
   <!-- ═══════════════════════════════════════════════════ -->
   <div id="page-home" class="page-view active">
 
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-content">
-        <div class="hero-badge">Nueva Temporada 2026</div>
-        <h1>Tu estilo, <span>tu esencia</span></h1>
-        <p>Descubri las ultimas tendencias en moda femenina. Envios a todo Tucuman y el pais.</p>
-        <div class="hero-buttons">
-          <a href="#productos" class="btn btn-primary">Ver Coleccion</a>
-          <a href="#contacto" class="btn btn-outline">Contacto</a>
+    <!-- Hero Carousel -->
+    <div class="hero-carousel" id="hero-carousel">
+      <div class="slides" id="carousel-slides">
+        <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&h=600&fit=crop')">
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <h2>Nueva Temporada 2026</h2>
+            <p>Tu estilo, tu esencia. Descubri las ultimas tendencias.</p>
+            <a href="#productos" class="btn btn-primary" style="background:#fff; color:var(--pink-600);">Ver Coleccion</a>
+          </div>
+        </div>
+        <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&h=600&fit=crop')">
+          <div class="slide-overlay" style="background:linear-gradient(135deg, rgba(179,0,71,0.7), rgba(255,45,120,0.5));"></div>
+          <div class="slide-content">
+            <h2>Hasta 40% OFF</h2>
+            <p>Ofertas especiales en vestidos, blusas y mas.</p>
+            <a href="#productos" class="btn btn-primary" style="background:#fff; color:var(--pink-600);">Comprar Ahora</a>
+          </div>
+        </div>
+        <div class="slide" style="background-image:url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&h=600&fit=crop')">
+          <div class="slide-overlay" style="background:linear-gradient(135deg, rgba(255,90,149,0.7), rgba(230,0,92,0.5));"></div>
+          <div class="slide-content">
+            <h2>Be a Varsovia Girl</h2>
+            <p>Registrate y accede a descuentos exclusivos.</p>
+            <a onclick="showPage('varsovia-girl')" class="btn btn-primary" style="background:#fff; color:var(--pink-600); cursor:pointer;">Registrarme</a>
+          </div>
         </div>
       </div>
-    </section>
+      <button class="carousel-btn prev" onclick="moveCarousel(-1)">&#8249;</button>
+      <button class="carousel-btn next" onclick="moveCarousel(1)">&#8250;</button>
+      <div class="carousel-dots" id="carousel-dots"></div>
+    </div>
 
     <!-- Products Section -->
     <div class="section-title" id="productos">
@@ -1141,7 +1286,7 @@
             </div>
           </div>
 
-          <div class="checkout-form-section" style="margin-top:1.5rem">
+          <div class="checkout-form-section" id="address-section" style="margin-top:1.5rem">
             <h3>📍 Direccion de envio</h3>
             <div class="form-group">
               <label>Direccion</label>
@@ -1168,13 +1313,13 @@
           </div>
 
           <div class="checkout-form-section" style="margin-top:1.5rem">
-            <h3>🚚 Metodo de envio</h3>
+            <h3>🚚 Zona de envio</h3>
             <div class="form-group">
-              <select id="checkout-shipping">
-                <option value="delivery">Envio a domicilio — $1.500</option>
-                <option value="pickup">Retiro en tienda — Gratis</option>
+              <select id="checkout-shipping" onchange="renderCheckoutSummary()">
+                <option value="" disabled>Cargando zonas...</option>
               </select>
             </div>
+            <div id="shipping-estimate" style="font-size:0.82rem; color:var(--neutral-600); margin-top:-0.5rem;"></div>
           </div>
         </div>
 
@@ -1207,20 +1352,87 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════════ -->
+  <!-- BE A VARSOVIA GIRL PAGE                             -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div id="page-varsovia-girl" class="page-view">
+    <div class="varsovia-girl-page">
+      <a class="checkout-back" onclick="showPage('home')" style="display:inline-flex; align-items:center; gap:0.5rem; color:var(--neutral-600); text-decoration:none; font-size:0.9rem; margin-bottom:1.5rem; cursor:pointer;">← Volver a la tienda</a>
+      <div class="vg-badge">Exclusivo</div>
+      <h2 class="vg-title">Be a Varsovia Girl</h2>
+      <p class="vg-subtitle">Unite a nuestra comunidad y accede a beneficios exclusivos. Registrate gratis y empeza a disfrutar.</p>
+
+      <div class="vg-perks">
+        <div class="vg-perk">
+          <div class="vg-perk-icon">🏷️</div>
+          <h4>Descuentos Exclusivos</h4>
+          <p>Hasta 20% en colecciones nuevas</p>
+        </div>
+        <div class="vg-perk">
+          <div class="vg-perk-icon">📦</div>
+          <h4>Seguimiento de Pedidos</h4>
+          <p>Consulta el estado de tus compras</p>
+        </div>
+        <div class="vg-perk">
+          <div class="vg-perk-icon">🎁</div>
+          <h4>Ofertas Anticipadas</h4>
+          <p>Acceso anticipado a promos y sales</p>
+        </div>
+        <div class="vg-perk">
+          <div class="vg-perk-icon">💕</div>
+          <h4>Comunidad VIP</h4>
+          <p>Eventos y novedades exclusivas</p>
+        </div>
+      </div>
+
+      <div class="vg-form">
+        <h3 style="font-family:'Playfair Display',serif; font-size:1.2rem; margin-bottom:1rem; color:var(--neutral-900);">Registrate</h3>
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="vg-name" placeholder="Tu nombre y apellido">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="vg-email" placeholder="tu@email.com">
+        </div>
+        <div class="form-group">
+          <label>Telefono</label>
+          <input type="tel" id="vg-phone" placeholder="+54 9 381 ...">
+        </div>
+        <div class="form-group">
+          <label>Direccion (opcional)</label>
+          <input type="text" id="vg-address" placeholder="Para envios mas rapidos">
+        </div>
+        <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:0.5rem;" id="vg-submit-btn" onclick="registerVarsoviaGirl()">
+          Unirme a Varsovia Girl
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
   <!-- SUCCESS PAGE                                        -->
   <!-- ═══════════════════════════════════════════════════ -->
   <div id="page-success" class="page-view">
-    <div style="text-align:center; padding:6rem 2rem;">
+    <div style="text-align:center; padding:4rem 2rem; max-width:500px; margin:0 auto;">
       <div style="font-size:4rem; margin-bottom:1rem;">✅</div>
       <h2 style="font-family:'Playfair Display',serif; font-size:2rem; margin-bottom:1rem; color:var(--neutral-900);">
         Pedido Confirmado
       </h2>
-      <p style="color:var(--neutral-600); max-width:400px; margin:0 auto 2rem; line-height:1.6;">
-        Gracias por tu compra! Recibiras un email con los detalles de tu pedido y el seguimiento del envio.
+      <p id="success-order-id" style="font-size:0.85rem; color:var(--pink-600); font-weight:600; margin-bottom:1rem;"></p>
+      <p style="color:var(--neutral-600); max-width:400px; margin:0 auto 1.5rem; line-height:1.6;">
+        Gracias por tu compra! Te avisaremos por WhatsApp cuando tu pedido este en camino.
       </p>
-      <a class="btn btn-primary" onclick="showPage('home'); cart = []; saveCart(); updateCartUI();">
-        Volver a la Tienda
-      </a>
+
+      <div id="success-delivery-info" style="background:#fff; border:1px solid var(--pink-100); border-radius:16px; padding:1.5rem; margin-bottom:1.5rem; text-align:left;"></div>
+
+      <div style="display:flex; flex-direction:column; gap:0.75rem; align-items:center;">
+        <a id="success-whatsapp-btn" href="#" target="_blank" class="btn btn-primary" style="background:#25D366; box-shadow:0 4px 20px rgba(37,211,102,0.3); width:100%; justify-content:center;">
+          💬 Contactar por WhatsApp
+        </a>
+        <a class="btn btn-outline" onclick="showPage('home'); cart = []; saveCart(); updateCartUI();" style="width:100%; justify-content:center;">
+          Volver a la Tienda
+        </a>
+      </div>
     </div>
   </div>
 
@@ -1247,7 +1459,7 @@
       </div>
       <div class="cart-summary-row">
         <span>Envio estimado</span>
-        <span>$1.500</span>
+        <span>desde $1.000</span>
       </div>
       <div class="cart-total-row">
         <span class="cart-total-label">Total</span>
@@ -1268,26 +1480,27 @@
     <div class="footer-grid">
       <div class="footer-col">
         <div class="footer-brand">Varsovia</div>
-        <p style="font-size:0.85rem; line-height:1.6;">Moda femenina con estilo unico. San Miguel de Tucuman, Argentina.</p>
+        <p style="font-size:0.85rem; line-height:1.6;">Moda femenina con estilo unico.<br>San Miguel de Tucuman, Argentina.</p>
+        <p style="font-size:0.8rem; margin-top:0.5rem; color:var(--neutral-600);">San Martin 500 — Lun a Sab 10 a 20hs</p>
       </div>
       <div class="footer-col">
         <h4>Tienda</h4>
-        <a href="#">Nuevos ingresos</a>
-        <a href="#">Ofertas</a>
-        <a href="#">Categorias</a>
-        <a href="#">Talles</a>
+        <a href="#productos" onclick="showPage('home')">Nuevos ingresos</a>
+        <a href="#productos" onclick="showPage('home')">Ofertas</a>
+        <a href="#productos" onclick="showPage('home')">Categorias</a>
+        <a href="#" onclick="showPage('varsovia-girl')">Be a Varsovia Girl</a>
       </div>
       <div class="footer-col">
         <h4>Ayuda</h4>
-        <a href="#">Envios</a>
+        <a href="#">Envios a todo Tucuman</a>
         <a href="#">Cambios y devoluciones</a>
         <a href="#">Medios de pago</a>
-        <a href="#">Contacto</a>
+        <a href="https://wa.me/543813685203" target="_blank">Contacto por WhatsApp</a>
       </div>
       <div class="footer-col">
         <h4>Seguinos</h4>
-        <a href="#">Instagram</a>
-        <a href="#">WhatsApp</a>
+        <a href="https://www.instagram.com/varsoviastore.tuc/" target="_blank">Instagram @varsoviastore.tuc</a>
+        <a href="https://wa.me/543813685203" target="_blank">WhatsApp</a>
         <a href="#">TikTok</a>
       </div>
     </div>
@@ -1379,9 +1592,33 @@
       return cart.reduce((sum, item) => sum + item.qty, 0);
     }
 
+    // Delivery zones loaded from API
+    let deliveryZones = [];
+
     function getShippingCost() {
       const el = document.getElementById('checkout-shipping');
-      return el && el.value === 'pickup' ? 0 : 1500;
+      if (!el || !el.value) return 0;
+      const zone = deliveryZones.find(z => z.id === el.value);
+      return zone ? zone.price : 0;
+    }
+
+    function getSelectedZone() {
+      const el = document.getElementById('checkout-shipping');
+      return deliveryZones.find(z => z.id === el?.value) || null;
+    }
+
+    async function loadDeliveryZones() {
+      try {
+        const res = await fetch('/api/uber/zones');
+        const data = await res.json();
+        deliveryZones = data.zones;
+        const select = document.getElementById('checkout-shipping');
+        select.innerHTML = deliveryZones.map(z =>
+          `<option value="${z.id}">${z.name} — ${z.price === 0 ? 'Gratis' : '$' + z.price.toLocaleString('es-AR')}</option>`
+        ).join('');
+      } catch (err) {
+        console.error('Error loading zones:', err);
+      }
     }
 
     // ═══════════════════════════════════════════════════
@@ -1438,7 +1675,7 @@
 
       document.getElementById('cart-item-count').textContent = count;
       document.getElementById('cart-subtotal').textContent = '$' + subtotal.toLocaleString('es-AR');
-      document.getElementById('cart-total').textContent = '$' + (subtotal + 1500).toLocaleString('es-AR');
+      document.getElementById('cart-total').textContent = '$' + (subtotal + 1000).toLocaleString('es-AR') + '+';
     }
 
     // ═══════════════════════════════════════════════════
@@ -1459,10 +1696,11 @@
     // ═══════════════════════════════════════════════════
     // CHECKOUT
     // ═══════════════════════════════════════════════════
-    function goToCheckout() {
+    async function goToCheckout() {
       if (cart.length === 0) return;
       closeCart();
       showPage('checkout');
+      await loadDeliveryZones();
       renderCheckoutSummary();
     }
 
@@ -1486,10 +1724,19 @@
       document.getElementById('checkout-subtotal').textContent = '$' + subtotal.toLocaleString('es-AR');
       document.getElementById('checkout-shipping-cost').textContent = shipping === 0 ? 'Gratis' : '$' + shipping.toLocaleString('es-AR');
       document.getElementById('checkout-total').textContent = '$' + (subtotal + shipping).toLocaleString('es-AR');
-    }
 
-    // Shipping method change
-    document.getElementById('checkout-shipping').addEventListener('change', renderCheckoutSummary);
+      // Show estimated time
+      const zone = getSelectedZone();
+      const estimateEl = document.getElementById('shipping-estimate');
+      const addressSection = document.getElementById('address-section');
+      if (zone && zone.price === 0) {
+        estimateEl.innerHTML = '🏪 Retira en nuestra tienda — San Martin 500, San Miguel de Tucuman';
+        if (addressSection) addressSection.style.display = 'none';
+      } else {
+        estimateEl.innerHTML = '';
+        if (addressSection) addressSection.style.display = 'block';
+      }
+    }
 
     // ═══════════════════════════════════════════════════
     // PLACE ORDER
@@ -1500,8 +1747,12 @@
       const email = document.getElementById('checkout-email').value.trim();
       const phone = document.getElementById('checkout-phone').value.trim();
       const address = document.getElementById('checkout-address').value.trim();
+      const city = document.getElementById('checkout-city').value.trim();
+      const notes = document.getElementById('checkout-notes').value.trim();
+      const zone = getSelectedZone();
 
-      if (!name || !lastname || !email || !phone || !address) {
+      const isPickup = zone && zone.price === 0;
+      if (!name || !lastname || !email || !phone || (!isPickup && !address)) {
         showToast('⚠️ Por favor completa todos los campos obligatorios');
         return;
       }
@@ -1512,6 +1763,26 @@
 
       try {
         const shipping = getShippingCost();
+
+        // 1. Create delivery order
+        const deliveryRes = await fetch('/api/uber/create-delivery', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customer: {
+              name: name + ' ' + lastname,
+              phone,
+              address: isPickup ? 'Retiro en tienda' : (address + ', ' + city),
+              zone: zone?.id || 'centro',
+              notes
+            },
+            items: cart.map(item => ({ id: item.id, name: item.name, qty: item.qty, price: item.price }))
+          })
+        });
+        const deliveryData = await deliveryRes.json();
+        const orderId = deliveryData.delivery?.orderId || 'ORD-' + Date.now();
+
+        // 2. Create MercadoPago payment
         const response = await fetch('/api/mercadopago/create-preference', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1531,21 +1802,21 @@
 
         if (data.error) {
           showToast('❌ Error: ' + data.error);
-        } else if (data.init_point) {
-          // Redirect to MercadoPago production
-          window.location.href = data.init_point;
-          return;
-        } else if (data.sandbox_init_point) {
-          // Redirect to MercadoPago sandbox
-          window.location.href = data.sandbox_init_point;
-          return;
-        } else if (data.demo) {
-          // MercadoPago not configured — demo mode
-          showToast('📦 Pedido registrado: ' + data.orderId);
+        } else {
+          // BYPASS: skip MercadoPago redirect, go straight to success
+          // TODO: remove this bypass when ready for production
+          window._lastOrder = {
+            orderId,
+            whatsappUrl: deliveryData.whatsappUrl,
+            deliveryId: deliveryData.delivery?.id,
+            zone: zone?.name,
+            estimatedMin: zone?.estimatedMin
+          };
           cart = [];
           saveCart();
           updateCartUI();
           showPage('success');
+          renderSuccessPage();
         }
       } catch (err) {
         console.error('Order error:', err);
@@ -1566,6 +1837,57 @@
       toast.classList.add('show');
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ═══════════════════════════════════════════════════
+    // SUCCESS PAGE
+    // ═══════════════════════════════════════════════════
+    function renderSuccessPage() {
+      const order = window._lastOrder;
+      if (!order) return;
+
+      document.getElementById('success-order-id').textContent = 'Pedido: ' + order.orderId;
+
+      const infoEl = document.getElementById('success-delivery-info');
+      if (order.zone && order.zone !== 'Retiro en tienda') {
+        infoEl.innerHTML = `
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+            <span style="font-size:1.5rem;">🚚</span>
+            <div>
+              <div style="font-weight:600; color:var(--neutral-900);">Envio a domicilio</div>
+              <div style="font-size:0.85rem; color:var(--neutral-600);">${order.zone}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:1.5rem;">
+            <div>
+              <div style="font-size:0.72rem; text-transform:uppercase; color:var(--neutral-600); letter-spacing:0.05em;">Estado</div>
+              <div style="font-weight:700; color:var(--pink-600);">📋 Pendiente</div>
+            </div>
+            <div>
+              <div style="font-size:0.72rem; text-transform:uppercase; color:var(--neutral-600); letter-spacing:0.05em;">ID Envio</div>
+              <div style="font-weight:600; font-size:0.85rem; color:var(--neutral-700);">${order.deliveryId || '-'}</div>
+            </div>
+          </div>
+        `;
+      } else {
+        infoEl.innerHTML = `
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <span style="font-size:1.5rem;">🏪</span>
+            <div>
+              <div style="font-weight:600; color:var(--neutral-900);">Retiro en tienda</div>
+              <div style="font-size:0.85rem; color:var(--neutral-600);">Pasá a retirar tu pedido cuando quieras</div>
+            </div>
+          </div>
+        `;
+      }
+
+      const whatsappBtn = document.getElementById('success-whatsapp-btn');
+      if (order.whatsappUrl) {
+        whatsappBtn.href = order.whatsappUrl;
+        whatsappBtn.style.display = 'inline-flex';
+      } else {
+        whatsappBtn.style.display = 'none';
+      }
     }
 
     // ═══════════════════════════════════════════════════
@@ -1674,6 +1996,84 @@
       showToast('❌ El pago no se pudo completar. Intenta de nuevo.');
     } else if (checkoutStatus === 'pending') {
       showToast('⏳ Tu pago esta pendiente. Te avisaremos cuando se confirme.');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // HERO CAROUSEL
+    // ═══════════════════════════════════════════════════
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.hero-carousel .slide');
+    const slidesContainer = document.getElementById('carousel-slides');
+    const dotsContainer = document.getElementById('carousel-dots');
+
+    function initCarousel() {
+      if (!slides.length) return;
+      // Create dots
+      slides.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.onclick = () => goToSlide(i);
+        dotsContainer.appendChild(dot);
+      });
+      // Auto-advance every 5s
+      setInterval(() => moveCarousel(1), 5000);
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+      document.querySelectorAll('.carousel-dots .dot').forEach((d, i) => {
+        d.classList.toggle('active', i === currentSlide);
+      });
+    }
+
+    function moveCarousel(dir) {
+      const total = slides.length;
+      goToSlide((currentSlide + dir + total) % total);
+    }
+
+    initCarousel();
+
+    // ═══════════════════════════════════════════════════
+    // VARSOVIA GIRL REGISTRATION
+    // ═══════════════════════════════════════════════════
+    async function registerVarsoviaGirl() {
+      const name = document.getElementById('vg-name').value.trim();
+      const email = document.getElementById('vg-email').value.trim();
+      const phone = document.getElementById('vg-phone').value.trim();
+      const address = document.getElementById('vg-address').value.trim();
+
+      if (!name || !email) {
+        showToast('⚠️ Nombre y email son requeridos');
+        return;
+      }
+
+      const btn = document.getElementById('vg-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Registrando...';
+
+      try {
+        const res = await fetch('/api/uber/register-client', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, address })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast('💕 ' + data.message);
+          document.getElementById('vg-name').value = '';
+          document.getElementById('vg-email').value = '';
+          document.getElementById('vg-phone').value = '';
+          document.getElementById('vg-address').value = '';
+        } else {
+          showToast('❌ ' + (data.error || 'Error al registrar'));
+        }
+      } catch (err) {
+        showToast('❌ Error de conexion');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Unirme a Varsovia Girl';
     }
 
     // ─── Init ───────────────────────────────────────────

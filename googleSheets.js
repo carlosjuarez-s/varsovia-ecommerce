@@ -161,4 +161,60 @@ async function updateOrderStatus(orderId, status, amount) {
   });
 }
 
-module.exports = { getProducts, addProduct, updateProductStock, getOrders, addOrder, updateOrderStatus };
+// ─── Clients ─────────────────────────────────────────────────
+// Sheet "Clients" columns: ID | Nombre | Email | Telefono | Direccion | FechaRegistro
+
+async function addClient(client) {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  // Check if email already exists
+  try {
+    const existing = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: 'Clients!C2:C500',
+    });
+    const emails = (existing.data.values || []).flat();
+    if (emails.includes(client.email)) {
+      return { exists: true };
+    }
+  } catch (e) {
+    // Sheet might not exist yet, continue
+  }
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: 'Clients!A:F',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [[
+        'CLI-' + Date.now(),
+        client.name,
+        client.email,
+        client.phone || '',
+        client.address || '',
+        new Date().toLocaleDateString('es-AR')
+      ]]
+    }
+  });
+
+  return { success: true };
+}
+
+async function getClients() {
+  if (!SHEET_ID) return [];
+  const auth = getAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: 'Clients!A2:F500',
+  });
+
+  const rows = response.data.values || [];
+  return rows.map(r => ({
+    id: r[0], name: r[1], email: r[2], phone: r[3], address: r[4], date: r[5]
+  }));
+}
+
+module.exports = { getProducts, addProduct, updateProductStock, getOrders, addOrder, updateOrderStatus, addClient, getClients };
