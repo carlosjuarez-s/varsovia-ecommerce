@@ -38,6 +38,11 @@ app.use('/api/figma',       figmaRouter);
 app.use('/api/products',    productsRouter);
 app.use('/api/admin',       adminRouter);
 
+// ─── Checkout return URLs (redirect to frontend) ────────────
+app.get('/checkout/:status', (req, res) => {
+  res.redirect('/?checkout=' + req.params.status);
+});
+
 // ─── Health check ────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({
   status: 'ok',

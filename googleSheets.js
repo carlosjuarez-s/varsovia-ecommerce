@@ -32,23 +32,33 @@ async function getProducts() {
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: 'Productos!A2:K100',
+    range: 'Productos!A2:L100',
   });
 
   const rows = response.data.values || [];
+  console.log('📊 Google Sheets raw data:');
+  console.log(`   Total rows: ${rows.length}`);
+  rows.forEach((row, i) => {
+    console.log(`   Row ${i + 2}: [${row.join(' | ')}]`);
+  });
   return rows
-    .filter(r => r[9] !== 'No') // Activo column
+    .filter(r => r.length >= 2 && r[1]) // Must have at least a name
+    .filter(r => {
+      const activo = (r[9] || '').toString().toLowerCase().trim();
+      return activo !== 'no' && activo !== 'false';
+    })
     .map(r => ({
-      id:        Number(r[0]),
+      id:        Number(r[0]) || 0,
       name:      r[1] || '',
       category:  r[2] || '',
-      price:     Number(r[3]) || 0,
-      oldPrice:  r[4] ? Number(r[4]) : null,
+      price:     Number(String(r[3]).replace(/[$.]/g, '')) || 0,
+      oldPrice:  r[4] && r[4] !== 'null' ? Number(String(r[4]).replace(/[$.]/g, '')) : null,
       stock:     Number(r[5]) || 0,
-      color:     r[6] || '#E8DDD3',
-      emoji:     r[7] || '👗',
-      badge:     r[8] || null,
-      active:    r[9] !== 'No',
+      color:     r[6] && r[6] !== 'null' ? r[6] : '#E8DDD3',
+      emoji:     r[7] && r[7] !== 'null' ? r[7] : '👗',
+      badge:     r[8] && r[8] !== 'null' && r[8] !== '' ? r[8] : null,
+      active:    true,
+      image:     r[11] && r[11] !== 'null' && r[11] !== '' ? r[11] : null,
     }));
 }
 
