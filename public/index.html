@@ -2551,6 +2551,9 @@
           color: product.color,
           category: product.category,
           stock: product.stock,
+          discount: product.discount,
+          installments: product.installments,
+          description: product.description,
           qty: 1
         });
       }
@@ -2772,6 +2775,7 @@
           body: JSON.stringify({
             customer: {
               name: name + ' ' + lastname,
+              email,
               phone,
               address: isPickup ? 'Retiro en tienda' : (address + ', ' + city),
               zone: zone?.id || 'centro',
@@ -3103,7 +3107,17 @@
       document.getElementById('pd-price').textContent = '$' + product.price.toLocaleString('es-AR');
       const oldPriceEl = document.getElementById('pd-old-price');
       const discountEl = document.getElementById('pd-discount');
-      if (product.oldPrice && product.oldPrice > product.price) {
+      if (product.discount > 0) {
+        // Explicit discount from sheet
+        discountEl.textContent = '-' + product.discount + '%';
+        discountEl.style.display = '';
+        if (product.oldPrice && product.oldPrice > product.price) {
+          oldPriceEl.textContent = '$' + product.oldPrice.toLocaleString('es-AR');
+          oldPriceEl.style.display = '';
+        } else {
+          oldPriceEl.style.display = 'none';
+        }
+      } else if (product.oldPrice && product.oldPrice > product.price) {
         oldPriceEl.textContent = '$' + product.oldPrice.toLocaleString('es-AR');
         oldPriceEl.style.display = '';
         const pct = Math.round((1 - product.price / product.oldPrice) * 100);
@@ -3114,10 +3128,11 @@
         discountEl.style.display = 'none';
       }
 
-      // Installments
-      const inst3 = Math.round(product.price / 3);
+      // Installments (dynamic from sheet)
+      const numCuotas = product.installments || 3;
+      const instAmount = Math.round(product.price / numCuotas);
       document.getElementById('pd-installments').innerHTML =
-        `<strong>3 cuotas sin interes</strong> de $${inst3.toLocaleString('es-AR')}`;
+        `<strong>${numCuotas} cuotas sin interes</strong> de $${instAmount.toLocaleString('es-AR')}`;
 
       // Stock
       const stockEl = document.getElementById('pd-stock-badge');

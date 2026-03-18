@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addOrder, addClient } = require('../googleSheets');
+const { addOrder, addClient, decreaseStock, addSale } = require('../googleSheets');
 
 // ─── Delivery zones & pricing for Tucuman ────────────────────
 const DELIVERY_ZONES = [
@@ -77,9 +77,9 @@ router.post('/create-delivery', async (req, res) => {
     delivery.whatsappUrl = whatsappUrl;
 
     // Save order to Google Sheets "Pedidos"
+    const itemsSummary = (items || []).map(i => `${i.qty}x ${i.name}`).join(', ');
+    const total = (items || []).reduce((sum, i) => sum + (i.price * i.qty), 0) + zone.price;
     try {
-      const itemsSummary = (items || []).map(i => `${i.qty}x ${i.name}`).join(', ');
-      const total = (items || []).reduce((sum, i) => sum + (i.price * i.qty), 0) + zone.price;
       await addOrder({
         id: delivery.orderId,
         client: customer.name,
@@ -92,6 +92,30 @@ router.post('/create-delivery', async (req, res) => {
       console.log('📝 Pedido guardado en Google Sheets:', delivery.orderId);
     } catch (sheetErr) {
       console.error('⚠️ Error saving order to Sheets:', sheetErr.message);
+    }
+
+    // Decrease stock for purchased items
+    try {
+      await decreaseStock((items || []).map(i => ({ id: i.id, qty: i.qty })));
+    } catch (stockErr) {
+      console.error('⚠️ Error decreasing stock:', stockErr.message);
+    }
+
+    // Log sale to "Ventas" sheet
+    try {
+      await addSale({
+        orderId: delivery.orderId,
+        customerName: customer.name,
+        email: customer.email || '',
+        phone: customer.phone,
+        address: customer.address,
+        products: itemsSummary,
+        total: '$' + total.toLocaleString('es-AR'),
+        paymentMethod: 'MercadoPago',
+        deliveryZone: zone.name,
+      });
+    } catch (saleErr) {
+      console.error('⚠️ Error logging sale:', saleErr.message);
     }
 
     console.log('📦 Nuevo pedido de delivery:', delivery.id);
