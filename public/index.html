@@ -1516,11 +1516,310 @@
       color: var(--neutral-600);
     }
 
+    /* ─── Product Detail Page ─────────────────────────── */
+    .product-detail-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .pd-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--neutral-600);
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .pd-back:hover { color: var(--pink-600); }
+
+    .pd-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    /* Image gallery */
+    .pd-gallery { position: relative; }
+
+    .pd-main-image {
+      width: 100%;
+      height: 520px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--neutral-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      cursor: zoom-in;
+      position: relative;
+    }
+
+    .pd-main-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+
+    .pd-main-image:hover img { transform: scale(1.05); }
+
+    .pd-main-image .product-badge {
+      top: 16px;
+      left: 16px;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.85rem;
+    }
+
+    .pd-thumbnails {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      overflow-x: auto;
+    }
+
+    .pd-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color 0.2s;
+    }
+
+    .pd-thumb.active, .pd-thumb:hover { border-color: var(--pink-500); }
+
+    .pd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Info section */
+    .pd-info { position: sticky; top: 100px; }
+
+    .pd-breadcrumb {
+      font-size: 0.75rem;
+      color: var(--neutral-600);
+      margin-bottom: 0.75rem;
+    }
+
+    .pd-breadcrumb a {
+      color: var(--neutral-600);
+      text-decoration: none;
+    }
+
+    .pd-breadcrumb a:hover { color: var(--pink-600); }
+
+    .pd-breadcrumb span { color: var(--neutral-300); margin: 0 0.4rem; }
+
+    .pd-category {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--pink-500);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .pd-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--neutral-900);
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+
+    .pd-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .pd-price {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--neutral-900);
+    }
+
+    .pd-old-price {
+      font-size: 1rem;
+      color: var(--neutral-300);
+      text-decoration: line-through;
+    }
+
+    .pd-discount-badge {
+      background: var(--pink-600);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .pd-installments {
+      font-size: 0.82rem;
+      color: var(--neutral-600);
+      margin-bottom: 1.2rem;
+    }
+
+    .pd-installments strong { color: #22c55e; }
+
+    .pd-stock {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 1.2rem;
+    }
+
+    .pd-stock.in-stock { background: #dcfce7; color: #16a34a; }
+    .pd-stock.low-stock { background: #fef3c7; color: #d97706; }
+    .pd-stock.no-stock { background: #fee2e2; color: #dc2626; }
+
+    .pd-description {
+      font-size: 0.88rem;
+      color: var(--neutral-600);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      border-top: 1px solid var(--neutral-200);
+      padding-top: 1.2rem;
+    }
+
+    .pd-qty-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .pd-qty-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--neutral-600);
+    }
+
+    .pd-qty-selector {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--neutral-200);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .pd-qty-btn {
+      width: 38px;
+      height: 38px;
+      border: none;
+      background: #fff;
+      color: var(--neutral-700);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pd-qty-btn:hover { background: var(--pink-50); color: var(--pink-600); }
+
+    .pd-qty-value {
+      width: 40px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-left: 1px solid var(--neutral-200);
+      border-right: 1px solid var(--neutral-200);
+      line-height: 38px;
+    }
+
+    .pd-add-btn {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 999px;
+      border: none;
+      background: var(--pink-500);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .pd-add-btn:hover {
+      background: var(--pink-600);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 25px rgba(255, 45, 120, 0.3);
+    }
+
+    .pd-share {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--neutral-200);
+    }
+
+    .pd-share-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--neutral-600);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pd-share a {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--neutral-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--neutral-600);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .pd-share a:hover { background: var(--pink-50); color: var(--pink-600); }
+
+    /* Related products */
+    .pd-related {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--neutral-200);
+    }
+
+    .pd-related h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--neutral-900);
+    }
+
     /* ─── Responsive ───────────────────────────────────── */
     @media (max-width: 900px) {
       .checkout-grid { grid-template-columns: 1fr; }
       .checkout-order-summary { position: static; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
+      .pd-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .pd-info { position: static; }
     }
 
     @media (max-width: 768px) {
@@ -1541,6 +1840,10 @@
       .section-title h2 { font-size: 1.5rem; }
       .newsletter-form { flex-direction: column; }
       .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .product-detail-page { padding: 1rem; }
+      .pd-title { font-size: 1.4rem; }
+      .pd-price { font-size: 1.3rem; }
+      .pd-related .products-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -1885,6 +2188,75 @@
             🔒 Pago seguro con MercadoPago
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- PRODUCT DETAIL PAGE                                 -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div id="page-product" class="page-view">
+    <div class="product-detail-page">
+      <a class="pd-back" onclick="showPage('home')">← Volver a la tienda</a>
+
+      <div class="pd-grid">
+        <!-- Gallery -->
+        <div class="pd-gallery">
+          <div class="pd-main-image" id="pd-main-image"></div>
+        </div>
+
+        <!-- Info -->
+        <div class="pd-info">
+          <div class="pd-breadcrumb">
+            <a href="#" onclick="showPage('home')">Inicio</a>
+            <span>/</span>
+            <a href="#" id="pd-breadcrumb-cat" onclick="showPage('home')">Categoria</a>
+            <span>/</span>
+            <span id="pd-breadcrumb-name">Producto</span>
+          </div>
+          <div class="pd-category" id="pd-cat"></div>
+          <h1 class="pd-title" id="pd-title"></h1>
+
+          <div class="pd-price-row">
+            <span class="pd-price" id="pd-price"></span>
+            <span class="pd-old-price" id="pd-old-price"></span>
+            <span class="pd-discount-badge" id="pd-discount" style="display:none"></span>
+          </div>
+          <div class="pd-installments" id="pd-installments"></div>
+
+          <div id="pd-stock-badge"></div>
+
+          <div class="pd-description" id="pd-description"></div>
+
+          <div class="pd-qty-row">
+            <span class="pd-qty-label">Cantidad</span>
+            <div class="pd-qty-selector">
+              <button class="pd-qty-btn" onclick="changeDetailQty(-1)">−</button>
+              <div class="pd-qty-value" id="pd-qty">1</div>
+              <button class="pd-qty-btn" onclick="changeDetailQty(1)">+</button>
+            </div>
+          </div>
+
+          <button class="pd-add-btn" id="pd-add-btn" onclick="addDetailToCart()">
+            Agregar al Carrito
+          </button>
+
+          <div class="pd-share">
+            <span class="pd-share-label">Compartir</span>
+            <a id="pd-share-wsp" href="#" target="_blank" title="WhatsApp">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+            </a>
+            <a id="pd-share-ig" href="https://www.instagram.com/varsoviastore.tuc/" target="_blank" title="Instagram">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Products -->
+      <div class="pd-related">
+        <h3>Productos Relacionados</h3>
+        <div class="products-grid" id="pd-related-grid" style="padding:0 0 2rem;"></div>
       </div>
     </div>
   </div>
@@ -2622,7 +2994,7 @@
       grid.innerHTML = products.map(p => {
         const inCart = cart.find(c => c.id === p.id);
         return `
-        <div class="product-card">
+        <div class="product-card" onclick="openProductDetail(${JSON.stringify(p).replace(/"/g, '&quot;')})">
           <div class="product-image" style="background: ${p.color}15;">
             ${p.badge ? `<span class="product-badge ${p.badge === 'SALE' ? 'badge-sale' : 'badge-new'}">${p.badge}</span>` : ''}
             <span class="product-stock ${p.stock <= 5 ? 'stock-low' : 'stock-ok'}">
@@ -2639,7 +3011,7 @@
                 ${p.oldPrice ? `<span class="product-old-price">$${p.oldPrice.toLocaleString('es-AR')}</span>` : ''}
               </div>
               <button class="add-cart-btn ${inCart ? 'added' : ''}"
-                      onclick="addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})"
+                      onclick="event.stopPropagation(); addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})"
                       title="Agregar al carrito">
                 ${inCart ? '✓' : '+'}
               </button>
@@ -2696,6 +3068,161 @@
     }
 
     initCarousel();
+
+    // ═══════════════════════════════════════════════════
+    // PRODUCT DETAIL PAGE
+    // ═══════════════════════════════════════════════════
+    let detailProduct = null;
+    let detailQty = 1;
+
+    function openProductDetail(product) {
+      detailProduct = product;
+      detailQty = 1;
+
+      // Breadcrumb
+      document.getElementById('pd-breadcrumb-cat').textContent = product.category;
+      document.getElementById('pd-breadcrumb-cat').onclick = () => { showPage('home'); filterCategoryByName(product.category); };
+      document.getElementById('pd-breadcrumb-name').textContent = product.name;
+
+      // Category & Title
+      document.getElementById('pd-cat').textContent = product.category;
+      document.getElementById('pd-title').textContent = product.name;
+
+      // Main image
+      const mainImg = document.getElementById('pd-main-image');
+      if (product.image) {
+        mainImg.innerHTML = `
+          ${product.badge ? `<span class="product-badge ${product.badge === 'SALE' ? 'badge-sale' : 'badge-new'}">${product.badge}</span>` : ''}
+          <img src="${product.image}" alt="${product.name}" onerror="this.outerHTML='<span style=\\'font-size:6rem\\'>${product.emoji}</span>'">
+        `;
+      } else {
+        mainImg.innerHTML = `<span>${product.emoji}</span>`;
+      }
+
+      // Price
+      document.getElementById('pd-price').textContent = '$' + product.price.toLocaleString('es-AR');
+      const oldPriceEl = document.getElementById('pd-old-price');
+      const discountEl = document.getElementById('pd-discount');
+      if (product.oldPrice && product.oldPrice > product.price) {
+        oldPriceEl.textContent = '$' + product.oldPrice.toLocaleString('es-AR');
+        oldPriceEl.style.display = '';
+        const pct = Math.round((1 - product.price / product.oldPrice) * 100);
+        discountEl.textContent = '-' + pct + '%';
+        discountEl.style.display = '';
+      } else {
+        oldPriceEl.style.display = 'none';
+        discountEl.style.display = 'none';
+      }
+
+      // Installments
+      const inst3 = Math.round(product.price / 3);
+      document.getElementById('pd-installments').innerHTML =
+        `<strong>3 cuotas sin interes</strong> de $${inst3.toLocaleString('es-AR')}`;
+
+      // Stock
+      const stockEl = document.getElementById('pd-stock-badge');
+      if (product.stock <= 0) {
+        stockEl.innerHTML = '<div class="pd-stock no-stock">✕ Sin stock</div>';
+      } else if (product.stock <= 5) {
+        stockEl.innerHTML = `<div class="pd-stock low-stock">⚠ Quedan ${product.stock} unidades</div>`;
+      } else {
+        stockEl.innerHTML = `<div class="pd-stock in-stock">✓ ${product.stock} en stock</div>`;
+      }
+
+      // Description
+      const descEl = document.getElementById('pd-description');
+      descEl.textContent = product.description || 'Prenda de moda femenina de alta calidad. Perfecta para cualquier ocasion. Diseno exclusivo de Varsovia.';
+
+      // Qty
+      document.getElementById('pd-qty').textContent = '1';
+
+      // Add btn state
+      document.getElementById('pd-add-btn').textContent = 'Agregar al Carrito';
+      document.getElementById('pd-add-btn').disabled = product.stock <= 0;
+
+      // Share WhatsApp
+      const shareText = encodeURIComponent(`Mira este producto de Varsovia: ${product.name} - $${product.price.toLocaleString('es-AR')}`);
+      document.getElementById('pd-share-wsp').href = `https://wa.me/?text=${shareText}`;
+
+      // Related products (same category, exclude current)
+      const related = (window._allProducts || [])
+        .filter(p => p.category === product.category && p.id !== product.id)
+        .slice(0, 4);
+
+      const relGrid = document.getElementById('pd-related-grid');
+      if (related.length > 0) {
+        relGrid.innerHTML = related.map(p => {
+          const inCart = cart.find(c => c.id === p.id);
+          return `
+          <div class="product-card" onclick="openProductDetail(${JSON.stringify(p).replace(/"/g, '&quot;')})">
+            <div class="product-image" style="background: ${p.color}15;">
+              ${p.badge ? `<span class="product-badge ${p.badge === 'SALE' ? 'badge-sale' : 'badge-new'}">${p.badge}</span>` : ''}
+              <span class="product-stock ${p.stock <= 5 ? 'stock-low' : 'stock-ok'}">
+                ${p.stock <= 5 ? 'Quedan ' + p.stock : 'Stock ' + p.stock}
+              </span>
+              ${p.image ? `<img src="${p.image}" alt="${p.name}" onerror="this.outerHTML='<span>${p.emoji}</span>'">` : `<span>${p.emoji}</span>`}
+            </div>
+            <div class="product-info">
+              <div class="product-category">${p.category}</div>
+              <div class="product-name">${p.name}</div>
+              <div class="product-price-row">
+                <div>
+                  <span class="product-price">$${p.price.toLocaleString('es-AR')}</span>
+                  ${p.oldPrice ? `<span class="product-old-price">$${p.oldPrice.toLocaleString('es-AR')}</span>` : ''}
+                </div>
+                <button class="add-cart-btn ${inCart ? 'added' : ''}"
+                        onclick="event.stopPropagation(); addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})"
+                        title="Agregar al carrito">
+                  ${inCart ? '✓' : '+'}
+                </button>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+      } else {
+        relGrid.innerHTML = '';
+      }
+
+      showPage('product');
+    }
+
+    function changeDetailQty(delta) {
+      if (!detailProduct) return;
+      detailQty = Math.max(1, Math.min(detailQty + delta, detailProduct.stock));
+      document.getElementById('pd-qty').textContent = detailQty;
+    }
+
+    function addDetailToCart() {
+      if (!detailProduct || detailProduct.stock <= 0) return;
+      const existing = cart.find(item => item.id === detailProduct.id);
+      if (existing) {
+        const newQty = existing.qty + detailQty;
+        if (newQty > detailProduct.stock) {
+          showToast('⚠️ No hay mas stock disponible');
+          return;
+        }
+        existing.qty = newQty;
+      } else {
+        cart.push({
+          id: detailProduct.id,
+          name: detailProduct.name,
+          price: detailProduct.price,
+          oldPrice: detailProduct.oldPrice,
+          image: detailProduct.image,
+          emoji: detailProduct.emoji,
+          color: detailProduct.color,
+          category: detailProduct.category,
+          stock: detailProduct.stock,
+          qty: detailQty
+        });
+      }
+      saveCart();
+      updateCartUI();
+      const btn = document.getElementById('pd-add-btn');
+      btn.textContent = '✓ Agregado!';
+      setTimeout(() => { btn.textContent = 'Agregar al Carrito'; }, 1500);
+      showToast('✅ ' + detailProduct.name + ' agregado al carrito');
+    }
 
     // ═══════════════════════════════════════════════════
     // VARSOVIA GIRL REGISTRATION
