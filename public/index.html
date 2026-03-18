@@ -1722,6 +1722,52 @@
       text-decoration: line-through;
     }
 
+    .pd-colors { margin-bottom: 1.2rem; }
+    .pd-colors-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--neutral-600);
+      margin-bottom: 0.5rem;
+    }
+    .pd-colors-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+    .pd-color-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--neutral-200);
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      padding: 0;
+      outline: none;
+    }
+    .pd-color-btn:hover { transform: scale(1.1); }
+    .pd-color-btn.active {
+      border-color: var(--pink-600);
+      box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--pink-600);
+    }
+    .pd-color-btn.out-of-stock {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .pd-color-btn.out-of-stock::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: -2px;
+      right: -2px;
+      height: 2px;
+      background: #dc2626;
+      transform: rotate(-45deg);
+    }
+    .pd-color-name {
+      font-size: 0.8rem;
+      color: var(--neutral-600);
+      margin-left: 0.25rem;
+    }
+
     .pd-description {
       font-size: 0.88rem;
       color: var(--neutral-600);
@@ -2262,6 +2308,11 @@
 
           <div id="pd-stock-badge"></div>
 
+          <div class="pd-colors" id="pd-colors" style="display:none">
+            <div class="pd-colors-label">Color</div>
+            <div class="pd-colors-row" id="pd-colors-row"></div>
+          </div>
+
           <div class="pd-sizes" id="pd-sizes" style="display:none">
             <div class="pd-sizes-label">Talle</div>
             <div class="pd-sizes-row" id="pd-sizes-row"></div>
@@ -2727,7 +2778,7 @@
           </div>
           <div class="cart-item-details">
             <div class="cart-item-name">${item.name}</div>
-            ${item.size ? `<div style="font-size:0.72rem; color:var(--neutral-600); margin-top:0.15rem;">Talle: ${item.size}</div>` : ''}
+            ${item.productColor || item.size ? `<div style="font-size:0.72rem; color:var(--neutral-600); margin-top:0.15rem;">${[item.productColor, item.size ? 'Talle ' + item.size : ''].filter(Boolean).join(' / ')}</div>` : ''}
             <div class="cart-item-price">$${item.price.toLocaleString('es-AR')}</div>
             <div class="cart-item-qty">
               <button class="qty-btn" onclick="updateQty(${item.id}, -1)">−</button>
@@ -2781,7 +2832,7 @@
           </div>
           <div class="checkout-item-info">
             <div class="checkout-item-name">${item.name}</div>
-            ${item.size ? `<div style="font-size:0.75rem; color:var(--neutral-600);">Talle: ${item.size}</div>` : ''}
+            ${item.productColor || item.size ? `<div style="font-size:0.75rem; color:var(--neutral-600);">${[item.productColor, item.size ? 'Talle ' + item.size : ''].filter(Boolean).join(' / ')}</div>` : ''}
             <div class="checkout-item-qty">Cant: ${item.qty}</div>
           </div>
           <div class="checkout-item-total">$${(item.price * item.qty).toLocaleString('es-AR')}</div>
@@ -2843,7 +2894,7 @@
               zone: zone?.id || 'centro',
               notes
             },
-            items: cart.map(item => ({ id: item.id, name: item.name, qty: item.qty, price: item.price, size: item.size || null }))
+            items: cart.map(item => ({ id: item.id, name: item.name, qty: item.qty, price: item.price, size: item.size || null, productColor: item.productColor || null }))
           })
         });
         const deliveryData = await deliveryRes.json();
@@ -3145,6 +3196,7 @@
     let detailProduct = null;
     let detailQty = 1;
     let detailSize = null; // selected size { id, size, stock }
+    let detailColor = null; // selected color { name, hex }
 
     function openProductDetail(product) {
       detailProduct = product;
@@ -3205,27 +3257,34 @@
       document.getElementById('pd-installments').innerHTML =
         `<strong>${numCuotas} cuotas sin interes</strong> de $${instAmount.toLocaleString('es-AR')}`;
 
-      // Sizes
-      const sizesContainer = document.getElementById('pd-sizes');
-      const sizesRow = document.getElementById('pd-sizes-row');
-      detailSize = null;
-      if (product.sizes && product.sizes.length > 0) {
-        sizesContainer.style.display = '';
-        sizesRow.innerHTML = product.sizes.map(s => `
-          <button class="pd-size-btn ${s.stock <= 0 ? 'out-of-stock' : ''}"
-                  onclick="selectSize(${s.id}, '${s.size}', ${s.stock})"
-                  data-size-id="${s.id}">
-            ${s.size}
-          </button>
-        `).join('');
-        // Auto-select first available size
-        const firstAvail = product.sizes.find(s => s.stock > 0);
-        if (firstAvail) selectSize(firstAvail.id, firstAvail.size, firstAvail.stock);
+      // Colors
+      const colorsContainer = document.getElementById('pd-colors');
+      const colorsRow = document.getElementById('pd-colors-row');
+      detailColor = null;
+      if (product.colors && product.colors.length > 0) {
+        colorsContainer.style.display = '';
+        colorsRow.innerHTML = product.colors.map(c => {
+          const colorStock = getColorStock(product, c.name);
+          return `
+          <button class="pd-color-btn ${colorStock <= 0 ? 'out-of-stock' : ''}"
+                  style="background:${c.hex};"
+                  onclick="selectColor('${c.name}', '${c.hex}')"
+                  data-color-name="${c.name}"
+                  title="${c.name}">
+          </button>`;
+        }).join('') + '<span class="pd-color-name" id="pd-color-name"></span>';
+        // Auto-select first available color
+        const firstColor = product.colors.find(c => getColorStock(product, c.name) > 0);
+        if (firstColor) selectColor(firstColor.name, firstColor.hex);
       } else {
-        sizesContainer.style.display = 'none';
+        colorsContainer.style.display = 'none';
       }
 
-      // Stock (shows total or selected size stock)
+      // Sizes
+      detailSize = null;
+      renderSizesForColor(product);
+
+      // Stock (shows total or selected variant stock)
       updateStockDisplay(product);
 
       // Description
@@ -3290,24 +3349,115 @@
       showPage('product');
     }
 
+    // Get total stock for a color across all sizes
+    function getColorStock(product, colorName) {
+      if (!product.variants || product.variants.length === 0) return product.stock;
+      return product.variants
+        .filter(v => v.color && v.color.name === colorName)
+        .reduce((sum, v) => sum + v.stock, 0);
+    }
+
+    // Find the variant matching selected color + size
+    function findVariant(product, colorName, sizeName) {
+      if (!product.variants) return null;
+      return product.variants.find(v =>
+        (!colorName || (v.color && v.color.name === colorName)) &&
+        (!sizeName || v.size === sizeName)
+      );
+    }
+
+    function selectColor(colorName, colorHex) {
+      const colorStock = getColorStock(detailProduct, colorName);
+      if (colorStock <= 0) return;
+      detailColor = { name: colorName, hex: colorHex };
+      detailSize = null;
+      detailQty = 1;
+      document.getElementById('pd-qty').textContent = '1';
+      // Update active state
+      document.querySelectorAll('.pd-color-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.colorName === colorName);
+      });
+      // Show color name
+      const nameEl = document.getElementById('pd-color-name');
+      if (nameEl) nameEl.textContent = colorName;
+      // Re-render sizes filtered by selected color
+      renderSizesForColor(detailProduct);
+      updateStockDisplay(detailProduct);
+    }
+
+    function renderSizesForColor(product) {
+      const sizesContainer = document.getElementById('pd-sizes');
+      const sizesRow = document.getElementById('pd-sizes-row');
+      const hasColors = product.colors && product.colors.length > 0;
+      const hasVariants = product.variants && product.variants.length > 0;
+
+      if (hasVariants && product.sizes && product.sizes.length > 0) {
+        // Get unique sizes, with stock filtered by selected color
+        const uniqueSizes = [...new Set(product.variants.map(v => v.size).filter(Boolean))];
+        if (uniqueSizes.length > 0) {
+          sizesContainer.style.display = '';
+          sizesRow.innerHTML = uniqueSizes.map(sizeName => {
+            // Find variant for this size + selected color
+            const variant = hasColors && detailColor
+              ? product.variants.find(v => v.size === sizeName && v.color && v.color.name === detailColor.name)
+              : product.variants.find(v => v.size === sizeName);
+            const stock = variant ? variant.stock : 0;
+            const id = variant ? variant.id : 0;
+            return `
+            <button class="pd-size-btn ${stock <= 0 ? 'out-of-stock' : ''}"
+                    onclick="selectSize(${id}, '${sizeName}', ${stock})"
+                    data-size-id="${id}">
+              ${sizeName}
+            </button>`;
+          }).join('');
+          // Auto-select first available size
+          const firstAvail = uniqueSizes.find(sizeName => {
+            const v = hasColors && detailColor
+              ? product.variants.find(v => v.size === sizeName && v.color && v.color.name === detailColor.name)
+              : product.variants.find(v => v.size === sizeName);
+            return v && v.stock > 0;
+          });
+          if (firstAvail) {
+            const v = hasColors && detailColor
+              ? product.variants.find(v => v.size === firstAvail && v.color && v.color.name === detailColor.name)
+              : product.variants.find(v => v.size === firstAvail);
+            if (v) selectSize(v.id, firstAvail, v.stock);
+          }
+          return;
+        }
+      }
+      // No sizes — check if we have color-only variants (no size)
+      if (hasColors && detailColor && hasVariants) {
+        const variant = product.variants.find(v => v.color && v.color.name === detailColor.name && !v.size);
+        if (variant) {
+          detailSize = { id: variant.id, size: null, stock: variant.stock };
+        }
+      }
+      sizesContainer.style.display = 'none';
+    }
+
     function selectSize(id, size, stock) {
       if (stock <= 0) return;
       detailSize = { id, size, stock };
       detailQty = 1;
       document.getElementById('pd-qty').textContent = '1';
-      // Update active state
       document.querySelectorAll('.pd-size-btn').forEach(btn => {
         btn.classList.toggle('active', Number(btn.dataset.sizeId) === id);
       });
-      // Update stock display for selected size
       updateStockDisplay(detailProduct);
-      // Enable add button
       document.getElementById('pd-add-btn').disabled = false;
     }
 
     function updateStockDisplay(product) {
       const stockEl = document.getElementById('pd-stock-badge');
-      const stock = detailSize ? detailSize.stock : product.stock;
+      let stock;
+      if (detailSize) {
+        stock = detailSize.stock;
+      } else if (detailColor) {
+        stock = getColorStock(product, detailColor.name);
+      } else {
+        stock = product.stock;
+      }
       if (stock <= 0) {
         stockEl.innerHTML = '<div class="pd-stock no-stock">✕ Sin stock</div>';
       } else if (stock <= 5) {
@@ -3327,16 +3477,27 @@
     function addDetailToCart() {
       if (!detailProduct) return;
       const hasSizes = detailProduct.sizes && detailProduct.sizes.length > 0;
+      const hasColors = detailProduct.colors && detailProduct.colors.length > 0;
       if (hasSizes && !detailSize) {
         showToast('⚠️ Selecciona un talle');
+        return;
+      }
+      if (hasColors && !detailColor) {
+        showToast('⚠️ Selecciona un color');
         return;
       }
       const stockAvail = detailSize ? detailSize.stock : detailProduct.stock;
       if (stockAvail <= 0) return;
 
-      // Cart key: use size-specific ID if available, otherwise product ID
+      // Cart key: use variant-specific ID
       const cartId = detailSize ? detailSize.id : detailProduct.id;
-      const cartName = hasSizes ? `${detailProduct.name} (${detailSize.size})` : detailProduct.name;
+      // Build display name with size and color
+      const attrs = [];
+      if (detailColor) attrs.push(detailColor.name);
+      if (detailSize && detailSize.size) attrs.push(detailSize.size);
+      const cartName = attrs.length > 0
+        ? `${detailProduct.name} (${attrs.join(' / ')})`
+        : detailProduct.name;
 
       const existing = cart.find(item => item.id === cartId);
       if (existing) {
@@ -3358,6 +3519,7 @@
           category: detailProduct.category,
           stock: stockAvail,
           size: detailSize ? detailSize.size : null,
+          productColor: detailColor ? detailColor.name : null,
           qty: detailQty
         });
       }

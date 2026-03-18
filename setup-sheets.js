@@ -42,16 +42,16 @@ async function setup() {
   const auth = getAuth();
   const sheets = google.sheets({ version: 'v4', auth });
 
-  // 1. Add Descuento, Cuotas & Talle headers to Productos (M1, N1, O1)
-  console.log('1. Adding Descuento, Cuotas & Talle columns to Productos...');
+  // 1. Add Descuento, Cuotas, Talle & ColorProducto headers
+  console.log('1. Adding Descuento, Cuotas, Talle & ColorProducto columns...');
   try {
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range: 'Productos!M1:O1',
+      range: 'Productos!M1:P1',
       valueInputOption: 'USER_ENTERED',
-      requestBody: { values: [['Descuento', 'Cuotas', 'Talle']] },
+      requestBody: { values: [['Descuento', 'Cuotas', 'Talle', 'ColorProducto']] },
     });
-    console.log('   Done — M1: Descuento, N1: Cuotas, O1: Talle');
+    console.log('   Done — M1: Descuento, N1: Cuotas, O1: Talle, P1: ColorProducto');
   } catch (err) {
     console.error('   Error:', err.message);
   }

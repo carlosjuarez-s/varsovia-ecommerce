@@ -23,7 +23,7 @@ function getAuth() {
 const SHEET_ID = process.env.GOOGLE_SHEETS_ID;
 
 // ─── Products ────────────────────────────────────────────────
-// Sheet "Productos" columns: A:ID | B:Nombre | C:Categoría | D:Precio | E:PrecioOriginal | F:Stock | G:Color | H:Emoji | I:Badge | J:Activo | K:Descripcion | L:ImageURL | M:Descuento | N:Cuotas | O:Talle
+// Sheet "Productos" columns: A:ID | B:Nombre | C:Categoría | D:Precio | E:PrecioOriginal | F:Stock | G:Color | H:Emoji | I:Badge | J:Activo | K:Descripcion | L:ImageURL | M:Descuento | N:Cuotas | O:Talle | P:ColorProducto
 
 async function getProducts() {
   if (!SHEET_ID) throw new Error('GOOGLE_SHEETS_ID no configurado');
@@ -32,7 +32,7 @@ async function getProducts() {
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: 'Productos!A2:O500',
+    range: 'Productos!A2:P500',
   });
 
   const rows = response.data.values || [];
@@ -41,6 +41,16 @@ async function getProducts() {
   rows.forEach((row, i) => {
     console.log(`   Row ${i + 2}: [${row.join(' | ')}]`);
   });
+
+  // Parse ColorProducto column — format "Nombre:#HEX" e.g. "Rojo:#FF4444"
+  function parseProductColor(val) {
+    if (!val || val === 'null' || val === '') return null;
+    const parts = val.split(':');
+    if (parts.length === 2 && parts[1].startsWith('#')) {
+      return { name: parts[0].trim(), hex: parts[1].trim() };
+    }
+    return { name: val.trim(), hex: '#888888' };
+  }
 
   const activeRows = rows
     .filter(r => r.length >= 2 && r[1])
@@ -64,23 +74,36 @@ async function getProducts() {
       discount:     Number(r[12]) || 0,
       installments: Number(r[13]) || 3,
       size:         r[14] && r[14] !== 'null' && r[14] !== '' ? r[14].trim() : null,
+      productColor: parseProductColor(r[15]),
     }));
 
-  // Group products by name — aggregate sizes
+  // Group products by name — aggregate variants (size + color combos)
   const grouped = new Map();
   for (const row of activeRows) {
     const key = row.name;
     if (!grouped.has(key)) {
+      const variants = [];
+      if (row.size || row.productColor) {
+        variants.push({ id: row.id, size: row.size, color: row.productColor, stock: row.stock });
+      }
       grouped.set(key, {
         ...row,
         sizes: row.size ? [{ id: row.id, size: row.size, stock: row.stock }] : [],
+        colors: row.productColor ? [row.productColor] : [],
+        variants,
         stock: row.stock,
       });
     } else {
       const existing = grouped.get(key);
-      if (row.size) {
+      existing.stock += row.stock;
+      if (row.size || row.productColor) {
+        existing.variants.push({ id: row.id, size: row.size, color: row.productColor, stock: row.stock });
+      }
+      if (row.size && !existing.sizes.find(s => s.size === row.size)) {
         existing.sizes.push({ id: row.id, size: row.size, stock: row.stock });
-        existing.stock += row.stock; // total stock across all sizes
+      }
+      if (row.productColor && !existing.colors.find(c => c.name === row.productColor.name)) {
+        existing.colors.push(row.productColor);
       }
     }
   }

@@ -31,24 +31,24 @@ const SHEET_ID = process.env.GOOGLE_SHEETS_ID;
 
 // ─── Product templates ────────────────────────────────────
 const products = [
-  // VESTIDOS (15 products, some with sizes)
-  { name: 'Vestido Lencero Jupiter',   cat: 'Vestidos',    price: 32000, old: 42000, color: '#D4B5A0', emoji: '👗', badge: 'SALE',  desc: 'Vestido lencero de seda con tirantes finos. Corte al bies que estiliza la figura.', disc: 25, cuotas: 6, sizes: ['S','M','L'] },
+  // VESTIDOS (8 products, some with colors)
+  { name: 'Vestido Lencero Jupiter',   cat: 'Vestidos',    price: 32000, old: 42000, color: '#D4B5A0', emoji: '👗', badge: 'SALE',  desc: 'Vestido lencero de seda con tirantes finos. Corte al bies que estiliza la figura.', disc: 25, cuotas: 6, sizes: ['S','M','L'], prodColors: ['Negro:#1a1a1a','Nude:#D4B5A0','Bordo:#800020'] },
   { name: 'Vestido Midi Floral',       cat: 'Vestidos',    price: 28500, old: 35000, color: '#FFB6C1', emoji: '🌸', badge: '',      desc: 'Vestido midi con estampado floral. Ideal para eventos de dia.', disc: 18, cuotas: 3, sizes: ['S','M','L','XL'] },
-  { name: 'Vestido Rojo Elegante',     cat: 'Vestidos',    price: 45000, old: 55000, color: '#FF4444', emoji: '👗', badge: 'SALE',  desc: 'Vestido largo rojo para fiestas y eventos especiales.', disc: 20, cuotas: 6, sizes: ['S','M','L'] },
-  { name: 'Vestido Negro Basico',      cat: 'Vestidos',    price: 22000, old: '',    color: '#1a1a1a', emoji: '🖤', badge: '',      desc: 'Little black dress. Clasico y versatil para cualquier ocasion.', disc: 0, cuotas: 3, sizes: ['XS','S','M','L','XL'] },
-  { name: 'Vestido Blazer Rosa',       cat: 'Vestidos',    price: 38000, old: '',    color: '#FF85B3', emoji: '👗', badge: 'NEW',   desc: 'Vestido tipo blazer cruzado. Elegancia moderna.', disc: 0, cuotas: 6, sizes: ['S','M','L'] },
+  { name: 'Vestido Rojo Elegante',     cat: 'Vestidos',    price: 45000, old: 55000, color: '#FF4444', emoji: '👗', badge: 'SALE',  desc: 'Vestido largo rojo para fiestas y eventos especiales.', disc: 20, cuotas: 6, sizes: ['S','M','L'], prodColors: ['Rojo:#FF4444','Negro:#1a1a1a'] },
+  { name: 'Vestido Negro Basico',      cat: 'Vestidos',    price: 22000, old: '',    color: '#1a1a1a', emoji: '🖤', badge: '',      desc: 'Little black dress. Clasico y versatil para cualquier ocasion.', disc: 0, cuotas: 3, sizes: ['XS','S','M','L','XL'], prodColors: ['Negro:#1a1a1a','Blanco:#FAFAFA','Azul:#1E3A5F'] },
+  { name: 'Vestido Blazer Rosa',       cat: 'Vestidos',    price: 38000, old: '',    color: '#FF85B3', emoji: '👗', badge: 'NEW',   desc: 'Vestido tipo blazer cruzado. Elegancia moderna.', disc: 0, cuotas: 6, sizes: ['S','M','L'], prodColors: ['Rosa:#FF85B3','Negro:#1a1a1a'] },
   { name: 'Vestido Crochet Playa',     cat: 'Vestidos',    price: 18500, old: 24000, color: '#F5E6D3', emoji: '🏖️', badge: '',     desc: 'Vestido tejido a crochet perfecto para la playa.', disc: 15, cuotas: 3, sizes: ['U'] },
   { name: 'Vestido Satinado Esmeralda',cat: 'Vestidos',    price: 41000, old: '',    color: '#2E8B57', emoji: '✨', badge: 'NEW',   desc: 'Vestido de satin color esmeralda. Ideal para galas y cenas.', disc: 0, cuotas: 6, sizes: ['S','M','L'] },
-  { name: 'Vestido Cut-Out Blanco',    cat: 'Vestidos',    price: 29000, old: 36000, color: '#FAFAFA', emoji: '👗', badge: '',      desc: 'Vestido blanco con recortes laterales. Tendencia pura.', disc: 20, cuotas: 3, sizes: ['S','M','L'] },
+  { name: 'Vestido Cut-Out Blanco',    cat: 'Vestidos',    price: 29000, old: 36000, color: '#FAFAFA', emoji: '👗', badge: '',      desc: 'Vestido blanco con recortes laterales. Tendencia pura.', disc: 20, cuotas: 3, sizes: ['S','M','L'], prodColors: ['Blanco:#FAFAFA','Rosa:#FFB6C1'] },
 
   // BLUSAS (8 products)
-  { name: 'Blusa Romantica',           cat: 'Blusas',      price: 18000, old: '',    color: '#FF69B4', emoji: '👚', badge: 'NEW',   desc: 'Blusa con volados y escote en V. Tela liviana y fresca.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'] },
-  { name: 'Blusa Crop Lino',           cat: 'Blusas',      price: 14500, old: '',    color: '#E8DDD3', emoji: '🌿', badge: '',      desc: 'Blusa crop de lino natural. Perfecta para el verano.', disc: 0, cuotas: 3, sizes: ['S','M','L'] },
+  { name: 'Blusa Romantica',           cat: 'Blusas',      price: 18000, old: '',    color: '#FF69B4', emoji: '👚', badge: 'NEW',   desc: 'Blusa con volados y escote en V. Tela liviana y fresca.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'], prodColors: ['Blanco:#FAFAFA','Rosa:#FF69B4','Celeste:#87CEEB'] },
+  { name: 'Blusa Crop Lino',           cat: 'Blusas',      price: 14500, old: '',    color: '#E8DDD3', emoji: '🌿', badge: '',      desc: 'Blusa crop de lino natural. Perfecta para el verano.', disc: 0, cuotas: 3, sizes: ['S','M','L'], prodColors: ['Natural:#E8DDD3','Blanco:#FAFAFA'] },
   { name: 'Blusa Off-Shoulder Negra',  cat: 'Blusas',      price: 16000, old: 21000, color: '#2C2C2C', emoji: '👚', badge: 'SALE',  desc: 'Blusa con hombros descubiertos. Elegancia nocturna.', disc: 25, cuotas: 3, sizes: ['S','M','L'] },
   { name: 'Blusa Estampada Animal',    cat: 'Blusas',      price: 19500, old: '',    color: '#C4A882', emoji: '🐆', badge: 'NEW',   desc: 'Blusa con print animal. La estrella de cualquier outfit.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'] },
   { name: 'Camisa Oversize Blanca',    cat: 'Blusas',      price: 21000, old: '',    color: '#FFFFFF', emoji: '👔', badge: '',      desc: 'Camisa oversize en algodon premium. Basico de armario.', disc: 0, cuotas: 3, sizes: ['S','M','L'] },
   { name: 'Blusa Transparente Tul',    cat: 'Blusas',      price: 15000, old: 19000, color: '#E0B0FF', emoji: '✨', badge: '',      desc: 'Blusa de tul con bordados. Romantica y delicada.', disc: 20, cuotas: 3, sizes: ['S','M','L'] },
-  { name: 'Body Manga Larga',          cat: 'Blusas',      price: 12000, old: '',    color: '#1a1a1a', emoji: '👚', badge: '',      desc: 'Body basico de manga larga. Combina con todo.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'] },
+  { name: 'Body Manga Larga',          cat: 'Blusas',      price: 12000, old: '',    color: '#1a1a1a', emoji: '👚', badge: '',      desc: 'Body basico de manga larga. Combina con todo.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'], prodColors: ['Negro:#1a1a1a','Blanco:#FAFAFA','Nude:#D4B5A0'] },
   { name: 'Blusa Peplum Coral',        cat: 'Blusas',      price: 17500, old: 22000, color: '#FF7F50', emoji: '👚', badge: 'SALE',  desc: 'Blusa peplum que marca la cintura. Color tendencia.', disc: 20, cuotas: 3, sizes: ['S','M','L'] },
 
   // FALDAS (6 products)
@@ -63,7 +63,7 @@ const products = [
   { name: 'Pantalon Palazzo',          cat: 'Pantalones',   price: 28000, old: '',    color: '#C5BCCA', emoji: '👖', badge: '',      desc: 'Pantalon palazzo de tiro alto. Elegante y comodo.', disc: 0, cuotas: 6, sizes: ['S','M','L','XL'] },
   { name: 'Jean Mom Celeste',          cat: 'Pantalones',   price: 32000, old: 39000, color: '#87CEEB', emoji: '👖', badge: 'SALE',  desc: 'Jean mom fit tiro alto color celeste. El must have.', disc: 18, cuotas: 6, sizes: ['24','26','28','30','32'] },
   { name: 'Pantalon Cargo Beige',      cat: 'Pantalones',   price: 27000, old: '',    color: '#D2B48C', emoji: '👖', badge: 'NEW',   desc: 'Pantalon cargo con bolsillos laterales. Street style.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'] },
-  { name: 'Calza Deportiva Negra',     cat: 'Pantalones',   price: 14000, old: '',    color: '#1a1a1a', emoji: '🏃', badge: '',      desc: 'Calza deportiva de alta compresion. Para gym o salir.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'] },
+  { name: 'Calza Deportiva Negra',     cat: 'Pantalones',   price: 14000, old: '',    color: '#1a1a1a', emoji: '🏃', badge: '',      desc: 'Calza deportiva de alta compresion. Para gym o salir.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'], prodColors: ['Negro:#1a1a1a','Gris:#808080','Bordo:#800020'] },
   { name: 'Jean Wide Leg Negro',       cat: 'Pantalones',   price: 34000, old: 42000, color: '#1a1a1a', emoji: '👖', badge: '',      desc: 'Jean wide leg negro. El pantalon mas versatil.', disc: 20, cuotas: 6, sizes: ['24','26','28','30','32'] },
   { name: 'Short Jean Roturas',        cat: 'Pantalones',   price: 18000, old: '',    color: '#6B8CCC', emoji: '👖', badge: 'NEW',   desc: 'Short de jean con roturas. Verano total.', disc: 0, cuotas: 3, sizes: ['24','26','28','30'] },
   { name: 'Pantalon Sastrero Gris',    cat: 'Pantalones',   price: 30000, old: '',    color: '#808080', emoji: '👖', badge: '',      desc: 'Pantalon de vestir corte recto. Oficina o salida.', disc: 0, cuotas: 6, sizes: ['S','M','L'] },
@@ -78,7 +78,7 @@ const products = [
   { name: 'Chaleco Puffer Negro',      cat: 'Abrigos',      price: 32000, old: '',    color: '#2C2C2C', emoji: '🧥', badge: 'NEW',   desc: 'Chaleco puffer acolchado. Pratico y trendy.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'] },
 
   // TOPS (6 products)
-  { name: 'Top Crop Basico',           cat: 'Tops',         price: 12000, old: '',    color: '#1a1a1a', emoji: '👚', badge: 'NEW',   desc: 'Top crop basico en algodon. Disponible en varios colores.', disc: 0, cuotas: 3, sizes: ['S','M','L'] },
+  { name: 'Top Crop Basico',           cat: 'Tops',         price: 12000, old: '',    color: '#1a1a1a', emoji: '👚', badge: 'NEW',   desc: 'Top crop basico en algodon. Disponible en varios colores.', disc: 0, cuotas: 3, sizes: ['S','M','L'], prodColors: ['Negro:#1a1a1a','Blanco:#FAFAFA','Rosa:#FFB6C1','Verde:#90EE90'] },
   { name: 'Corset Strapless Negro',    cat: 'Tops',         price: 19000, old: 24000, color: '#1a1a1a', emoji: '🖤', badge: 'SALE',  desc: 'Corset strapless con ballenas. Sensual y estructurado.', disc: 20, cuotas: 3, sizes: ['S','M','L'] },
   { name: 'Top Halter Satinado',       cat: 'Tops',         price: 15500, old: '',    color: '#E0B0FF', emoji: '✨', badge: '',      desc: 'Top halter de satin. Elegancia minimalista.', disc: 0, cuotas: 3, sizes: ['S','M','L'] },
   { name: 'Musculosa Deportiva',       cat: 'Tops',         price: 10000, old: '',    color: '#90EE90', emoji: '💪', badge: '',      desc: 'Musculosa para entrenamiento. Tela respirable DryFit.', disc: 0, cuotas: 3, sizes: ['S','M','L','XL'] },
@@ -117,29 +117,43 @@ async function seed() {
   try {
     await sheets.spreadsheets.values.clear({
       spreadsheetId: SHEET_ID,
-      range: 'Productos!A2:O500',
+      range: 'Productos!A2:P500',
     });
   } catch (e) {
     console.log('  (no data to clear)');
   }
 
-  // Build rows — products with sizes become multiple rows
+  // Build rows — products with colors × sizes become multiple rows
   const rows = [];
   let id = 1;
   for (const p of products) {
-    if (p.sizes && p.sizes.length > 0) {
+    const hasSizes = p.sizes && p.sizes.length > 0;
+    const hasColors = p.prodColors && p.prodColors.length > 0;
+
+    if (hasColors && hasSizes) {
+      // color × size combinations
+      for (const colorStr of p.prodColors) {
+        for (const size of p.sizes) {
+          const stock = Math.floor(Math.random() * 10) + 1;
+          rows.push([
+            id++, p.name, p.cat, p.price, p.old || '', stock,
+            p.color, p.emoji, p.badge, 'Sí', p.desc, '', p.disc || '', p.cuotas || '', size, colorStr
+          ]);
+        }
+      }
+    } else if (hasSizes) {
       for (const size of p.sizes) {
-        const stock = Math.floor(Math.random() * 15) + 2; // 2-16 stock per size
+        const stock = Math.floor(Math.random() * 15) + 2;
         rows.push([
           id++, p.name, p.cat, p.price, p.old || '', stock,
-          p.color, p.emoji, p.badge, 'Sí', p.desc, '', p.disc || '', p.cuotas || '', size
+          p.color, p.emoji, p.badge, 'Sí', p.desc, '', p.disc || '', p.cuotas || '', size, ''
         ]);
       }
     } else {
-      const stock = Math.floor(Math.random() * 20) + 5; // 5-24 stock
+      const stock = Math.floor(Math.random() * 20) + 5;
       rows.push([
         id++, p.name, p.cat, p.price, p.old || '', stock,
-        p.color, p.emoji, p.badge, 'Sí', p.desc, '', p.disc || '', p.cuotas || '', ''
+        p.color, p.emoji, p.badge, 'Sí', p.desc, '', p.disc || '', p.cuotas || '', '', ''
       ]);
     }
   }
@@ -148,7 +162,7 @@ async function seed() {
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
-    range: `Productos!A2:O${rows.length + 1}`,
+    range: `Productos!A2:P${rows.length + 1}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: rows },
   });
@@ -156,6 +170,7 @@ async function seed() {
   console.log(`\nDone! ${rows.length} rows written.`);
   console.log(`  ${products.length} unique products`);
   console.log(`  ${products.filter(p => p.sizes?.length > 0).length} products with sizes`);
+  console.log(`  ${products.filter(p => p.prodColors?.length > 0).length} products with colors`);
   console.log(`  ${products.filter(p => p.disc > 0).length} products with discounts`);
   console.log(`  Categories: ${[...new Set(products.map(p => p.cat))].join(', ')}`);
 }
