@@ -283,4 +283,25 @@ async function getClients() {
   }));
 }
 
-module.exports = { getProducts, addProduct, updateProductStock, decreaseStock, addSale, getOrders, addOrder, updateOrderStatus, addClient, getClients };
+// ─── Configuration ──────────────────────────────────────
+// Sheet "Configuracion" columns: A:Clave | B:Valor
+
+async function getConfig() {
+  if (!SHEET_ID) return {};
+  const auth = getAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: 'Configuracion!A2:B50',
+  });
+
+  const rows = response.data.values || [];
+  const config = {};
+  for (const row of rows) {
+    if (row[0]) config[row[0]] = row[1] || '';
+  }
+  return config;
+}
+
+module.exports = { getProducts, addProduct, updateProductStock, decreaseStock, addSale, getOrders, addOrder, updateOrderStatus, addClient, getClients, getConfig };

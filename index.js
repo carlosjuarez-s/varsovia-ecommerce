@@ -9,6 +9,7 @@ const uberRouter = require('./routes/uber');
 const figmaRouter = require('./routes/figma');
 const productsRouter = require('./routes/products');
 const adminRouter = require('./routes/admin');
+const { getConfig } = require('./googleSheets');
 
 const path = require('path');
 
@@ -38,9 +39,25 @@ app.use('/api/figma',       figmaRouter);
 app.use('/api/products',    productsRouter);
 app.use('/api/admin',       adminRouter);
 
+// ─── Config API ───────────────────────────────────────────
+app.get('/api/config', async (req, res) => {
+  try {
+    const config = await getConfig();
+    res.json({ success: true, config });
+  } catch (err) {
+    console.error('Config error:', err.message);
+    res.json({ success: true, config: {} });
+  }
+});
+
 // ─── Checkout return URLs (redirect to frontend) ────────────
 app.get('/checkout/:status', (req, res) => {
   res.redirect('/?checkout=' + req.params.status);
+});
+
+// ─── Product URL (SEO-friendly /producto/nombre-del-producto) ──
+app.get('/producto/:slug', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // ─── Health check ────────────────────────────────────────────

@@ -775,6 +775,7 @@
 
     .badge-sale { background: var(--pink-600); color: #fff; }
     .badge-new { background: var(--neutral-900); color: #fff; }
+    .badge-discount { background: #22c55e; color: #fff; }
 
     .product-stock {
       position: absolute;
@@ -1872,7 +1873,7 @@
   <!-- ANNOUNCEMENT BAR                                    -->
   <!-- ═══════════════════════════════════════════════════ -->
   <div class="announcement-bar">
-    <div class="announcement-track">
+    <div class="announcement-track" id="announcement-track">
       <span>Envios a todo Tucuman</span>
       <span>3 cuotas sin interes</span>
       <span>10% OFF con transferencia</span>
@@ -2456,7 +2457,21 @@
       document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + page).classList.add('active');
       window.scrollTo(0, 0);
+      // Clean URL when leaving product page
+      if (page !== 'product' && window.location.pathname.startsWith('/producto/')) {
+        window.history.pushState({}, '', '/');
+      }
     }
+
+    // Handle browser back button
+    window.addEventListener('popstate', () => {
+      if (window.location.pathname.startsWith('/producto/')) {
+        // Re-open product from URL
+        handleProductUrl();
+      } else {
+        showPage('home');
+      }
+    });
 
     // ═══════════════════════════════════════════════════
     // MOBILE MENU
@@ -2997,10 +3012,14 @@
       }
       grid.innerHTML = products.map(p => {
         const inCart = cart.find(c => c.id === p.id);
+        const discountPct = p.discount || (p.oldPrice && p.oldPrice > p.price ? Math.round((1 - p.price / p.oldPrice) * 100) : 0);
+        const badgeHtml = discountPct > 0
+          ? `<span class="product-badge badge-discount">-${discountPct}%</span>`
+          : (p.badge ? `<span class="product-badge ${p.badge === 'SALE' ? 'badge-sale' : 'badge-new'}">${p.badge}</span>` : '');
         return `
         <div class="product-card" onclick="openProductDetail(${JSON.stringify(p).replace(/"/g, '&quot;')})">
           <div class="product-image" style="background: ${p.color}15;">
-            ${p.badge ? `<span class="product-badge ${p.badge === 'SALE' ? 'badge-sale' : 'badge-new'}">${p.badge}</span>` : ''}
+            ${badgeHtml}
             <span class="product-stock ${p.stock <= 5 ? 'stock-low' : 'stock-ok'}">
               ${p.stock <= 5 ? 'Quedan ' + p.stock : 'Stock ' + p.stock}
             </span>
@@ -3083,6 +3102,10 @@
       detailProduct = product;
       detailQty = 1;
 
+      // Update URL to shareable product link
+      const productSlug = toSlug(product.name);
+      window.history.pushState({ product: true }, '', '/producto/' + productSlug);
+
       // Breadcrumb
       document.getElementById('pd-breadcrumb-cat').textContent = product.category;
       document.getElementById('pd-breadcrumb-cat').onclick = () => { showPage('home'); filterCategoryByName(product.category); };
@@ -3155,8 +3178,9 @@
       document.getElementById('pd-add-btn').textContent = 'Agregar al Carrito';
       document.getElementById('pd-add-btn').disabled = product.stock <= 0;
 
-      // Share WhatsApp
-      const shareText = encodeURIComponent(`Mira este producto de Varsovia: ${product.name} - $${product.price.toLocaleString('es-AR')}`);
+      // Share WhatsApp (with shareable URL)
+      const productUrl = window.location.origin + '/producto/' + toSlug(product.name);
+      const shareText = encodeURIComponent(`Mira este producto de Varsovia: ${product.name} - $${product.price.toLocaleString('es-AR')}\n${productUrl}`);
       document.getElementById('pd-share-wsp').href = `https://wa.me/?text=${shareText}`;
 
       // Related products (same category, exclude current)
@@ -3168,10 +3192,14 @@
       if (related.length > 0) {
         relGrid.innerHTML = related.map(p => {
           const inCart = cart.find(c => c.id === p.id);
+          const discPct = p.discount || (p.oldPrice && p.oldPrice > p.price ? Math.round((1 - p.price / p.oldPrice) * 100) : 0);
+          const bHtml = discPct > 0
+            ? `<span class="product-badge badge-discount">-${discPct}%</span>`
+            : (p.badge ? `<span class="product-badge ${p.badge === 'SALE' ? 'badge-sale' : 'badge-new'}">${p.badge}</span>` : '');
           return `
           <div class="product-card" onclick="openProductDetail(${JSON.stringify(p).replace(/"/g, '&quot;')})">
             <div class="product-image" style="background: ${p.color}15;">
-              ${p.badge ? `<span class="product-badge ${p.badge === 'SALE' ? 'badge-sale' : 'badge-new'}">${p.badge}</span>` : ''}
+              ${bHtml}
               <span class="product-stock ${p.stock <= 5 ? 'stock-low' : 'stock-ok'}">
                 ${p.stock <= 5 ? 'Quedan ' + p.stock : 'Stock ' + p.stock}
               </span>
@@ -3309,9 +3337,68 @@
       setTimeout(() => ls.remove(), 600);
     }
 
+    // ─── Slug helper ────────────────────────────────────
+    function toSlug(name) {
+      return name.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+    }
+
+    // ─── Load config (announcement bar) ──────────────────
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/config');
+        const data = await res.json();
+        if (!data.success || !data.config) return;
+        const cfg = data.config;
+
+        // Update announcement bar
+        const msgs = [];
+        for (let i = 1; i <= 10; i++) {
+          const key = 'anuncio_' + i;
+          if (cfg[key]) msgs.push(cfg[key]);
+        }
+        if (msgs.length > 0) {
+          const track = document.getElementById('announcement-track');
+          // Duplicate messages for seamless marquee loop
+          const spans = msgs.concat(msgs).map(m => `<span>${m}</span>`).join('');
+          track.innerHTML = spans;
+        }
+      } catch (e) {
+        // Keep default announcement bar on error
+      }
+    }
+
+    // ─── URL routing for product pages ───────────────────
+    function handleProductUrl() {
+      const path = window.location.pathname;
+      const match = path.match(/^\/producto\/(.+)$/);
+      if (!match) return;
+      const slug = match[1];
+
+      // Wait for products to load, then open the matching product
+      const checkProducts = setInterval(() => {
+        if (!window._allProducts) return;
+        clearInterval(checkProducts);
+        const product = window._allProducts.find(p => toSlug(p.name) === slug);
+        if (product) {
+          openProductDetail(product);
+        } else {
+          showPage('home');
+          showToast('Producto no encontrado');
+          window.history.replaceState({}, '', '/');
+        }
+      }, 100);
+      // Timeout after 10s
+      setTimeout(() => clearInterval(checkProducts), 10000);
+    }
+
     // ─── Init ───────────────────────────────────────────
     updateCartUI();
     loadProducts();
+    loadConfig();
+    handleProductUrl();
   </script>
 </body>
 </html>
