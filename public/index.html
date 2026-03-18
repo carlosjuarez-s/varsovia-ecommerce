@@ -1687,6 +1687,41 @@
     .pd-stock.low-stock { background: #fef3c7; color: #d97706; }
     .pd-stock.no-stock { background: #fee2e2; color: #dc2626; }
 
+    .pd-sizes { margin-bottom: 1.2rem; }
+    .pd-sizes-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--neutral-600);
+      margin-bottom: 0.5rem;
+    }
+    .pd-sizes-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .pd-size-btn {
+      min-width: 44px;
+      height: 40px;
+      padding: 0 0.75rem;
+      border: 2px solid var(--neutral-200);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--neutral-800);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pd-size-btn:hover:not(.out-of-stock) { border-color: var(--neutral-800); }
+    .pd-size-btn.active {
+      border-color: var(--pink-600);
+      background: var(--pink-50);
+      color: var(--pink-600);
+    }
+    .pd-size-btn.out-of-stock {
+      opacity: 0.35;
+      cursor: not-allowed;
+      text-decoration: line-through;
+    }
+
     .pd-description {
       font-size: 0.88rem;
       color: var(--neutral-600);
@@ -2227,6 +2262,11 @@
 
           <div id="pd-stock-badge"></div>
 
+          <div class="pd-sizes" id="pd-sizes" style="display:none">
+            <div class="pd-sizes-label">Talle</div>
+            <div class="pd-sizes-row" id="pd-sizes-row"></div>
+          </div>
+
           <div class="pd-description" id="pd-description"></div>
 
           <div class="pd-qty-row">
@@ -2548,6 +2588,11 @@
     // CART OPERATIONS
     // ═══════════════════════════════════════════════════
     function addToCart(product) {
+      // If product has sizes, redirect to detail page to select size
+      if (product.sizes && product.sizes.length > 0) {
+        openProductDetail(product);
+        return;
+      }
       const existing = cart.find(item => item.id === product.id);
       if (existing) {
         if (existing.qty >= product.stock) {
@@ -2682,6 +2727,7 @@
           </div>
           <div class="cart-item-details">
             <div class="cart-item-name">${item.name}</div>
+            ${item.size ? `<div style="font-size:0.72rem; color:var(--neutral-600); margin-top:0.15rem;">Talle: ${item.size}</div>` : ''}
             <div class="cart-item-price">$${item.price.toLocaleString('es-AR')}</div>
             <div class="cart-item-qty">
               <button class="qty-btn" onclick="updateQty(${item.id}, -1)">−</button>
@@ -2735,6 +2781,7 @@
           </div>
           <div class="checkout-item-info">
             <div class="checkout-item-name">${item.name}</div>
+            ${item.size ? `<div style="font-size:0.75rem; color:var(--neutral-600);">Talle: ${item.size}</div>` : ''}
             <div class="checkout-item-qty">Cant: ${item.qty}</div>
           </div>
           <div class="checkout-item-total">$${(item.price * item.qty).toLocaleString('es-AR')}</div>
@@ -2796,7 +2843,7 @@
               zone: zone?.id || 'centro',
               notes
             },
-            items: cart.map(item => ({ id: item.id, name: item.name, qty: item.qty, price: item.price }))
+            items: cart.map(item => ({ id: item.id, name: item.name, qty: item.qty, price: item.price, size: item.size || null }))
           })
         });
         const deliveryData = await deliveryRes.json();
@@ -3097,6 +3144,7 @@
     // ═══════════════════════════════════════════════════
     let detailProduct = null;
     let detailQty = 1;
+    let detailSize = null; // selected size { id, size, stock }
 
     function openProductDetail(product) {
       detailProduct = product;
@@ -3157,15 +3205,28 @@
       document.getElementById('pd-installments').innerHTML =
         `<strong>${numCuotas} cuotas sin interes</strong> de $${instAmount.toLocaleString('es-AR')}`;
 
-      // Stock
-      const stockEl = document.getElementById('pd-stock-badge');
-      if (product.stock <= 0) {
-        stockEl.innerHTML = '<div class="pd-stock no-stock">✕ Sin stock</div>';
-      } else if (product.stock <= 5) {
-        stockEl.innerHTML = `<div class="pd-stock low-stock">⚠ Quedan ${product.stock} unidades</div>`;
+      // Sizes
+      const sizesContainer = document.getElementById('pd-sizes');
+      const sizesRow = document.getElementById('pd-sizes-row');
+      detailSize = null;
+      if (product.sizes && product.sizes.length > 0) {
+        sizesContainer.style.display = '';
+        sizesRow.innerHTML = product.sizes.map(s => `
+          <button class="pd-size-btn ${s.stock <= 0 ? 'out-of-stock' : ''}"
+                  onclick="selectSize(${s.id}, '${s.size}', ${s.stock})"
+                  data-size-id="${s.id}">
+            ${s.size}
+          </button>
+        `).join('');
+        // Auto-select first available size
+        const firstAvail = product.sizes.find(s => s.stock > 0);
+        if (firstAvail) selectSize(firstAvail.id, firstAvail.size, firstAvail.stock);
       } else {
-        stockEl.innerHTML = `<div class="pd-stock in-stock">✓ ${product.stock} en stock</div>`;
+        sizesContainer.style.display = 'none';
       }
+
+      // Stock (shows total or selected size stock)
+      updateStockDisplay(product);
 
       // Description
       const descEl = document.getElementById('pd-description');
@@ -3229,33 +3290,74 @@
       showPage('product');
     }
 
+    function selectSize(id, size, stock) {
+      if (stock <= 0) return;
+      detailSize = { id, size, stock };
+      detailQty = 1;
+      document.getElementById('pd-qty').textContent = '1';
+      // Update active state
+      document.querySelectorAll('.pd-size-btn').forEach(btn => {
+        btn.classList.toggle('active', Number(btn.dataset.sizeId) === id);
+      });
+      // Update stock display for selected size
+      updateStockDisplay(detailProduct);
+      // Enable add button
+      document.getElementById('pd-add-btn').disabled = false;
+    }
+
+    function updateStockDisplay(product) {
+      const stockEl = document.getElementById('pd-stock-badge');
+      const stock = detailSize ? detailSize.stock : product.stock;
+      if (stock <= 0) {
+        stockEl.innerHTML = '<div class="pd-stock no-stock">✕ Sin stock</div>';
+      } else if (stock <= 5) {
+        stockEl.innerHTML = `<div class="pd-stock low-stock">⚠ Quedan ${stock} unidades</div>`;
+      } else {
+        stockEl.innerHTML = `<div class="pd-stock in-stock">✓ ${stock} en stock</div>`;
+      }
+    }
+
     function changeDetailQty(delta) {
       if (!detailProduct) return;
-      detailQty = Math.max(1, Math.min(detailQty + delta, detailProduct.stock));
+      const maxStock = detailSize ? detailSize.stock : detailProduct.stock;
+      detailQty = Math.max(1, Math.min(detailQty + delta, maxStock));
       document.getElementById('pd-qty').textContent = detailQty;
     }
 
     function addDetailToCart() {
-      if (!detailProduct || detailProduct.stock <= 0) return;
-      const existing = cart.find(item => item.id === detailProduct.id);
+      if (!detailProduct) return;
+      const hasSizes = detailProduct.sizes && detailProduct.sizes.length > 0;
+      if (hasSizes && !detailSize) {
+        showToast('⚠️ Selecciona un talle');
+        return;
+      }
+      const stockAvail = detailSize ? detailSize.stock : detailProduct.stock;
+      if (stockAvail <= 0) return;
+
+      // Cart key: use size-specific ID if available, otherwise product ID
+      const cartId = detailSize ? detailSize.id : detailProduct.id;
+      const cartName = hasSizes ? `${detailProduct.name} (${detailSize.size})` : detailProduct.name;
+
+      const existing = cart.find(item => item.id === cartId);
       if (existing) {
         const newQty = existing.qty + detailQty;
-        if (newQty > detailProduct.stock) {
+        if (newQty > stockAvail) {
           showToast('⚠️ No hay mas stock disponible');
           return;
         }
         existing.qty = newQty;
       } else {
         cart.push({
-          id: detailProduct.id,
-          name: detailProduct.name,
+          id: cartId,
+          name: cartName,
           price: detailProduct.price,
           oldPrice: detailProduct.oldPrice,
           image: detailProduct.image,
           emoji: detailProduct.emoji,
           color: detailProduct.color,
           category: detailProduct.category,
-          stock: detailProduct.stock,
+          stock: stockAvail,
+          size: detailSize ? detailSize.size : null,
           qty: detailQty
         });
       }
@@ -3264,7 +3366,7 @@
       const btn = document.getElementById('pd-add-btn');
       btn.textContent = '✓ Agregado!';
       setTimeout(() => { btn.textContent = 'Agregar al Carrito'; }, 1500);
-      showToast('✅ ' + detailProduct.name + ' agregado al carrito');
+      showToast('✅ ' + cartName + ' agregado al carrito');
     }
 
     // ═══════════════════════════════════════════════════

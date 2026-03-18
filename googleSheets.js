@@ -23,7 +23,7 @@ function getAuth() {
 const SHEET_ID = process.env.GOOGLE_SHEETS_ID;
 
 // ─── Products ────────────────────────────────────────────────
-// Sheet "Productos" columns: A:ID | B:Nombre | C:Categoría | D:Precio | E:PrecioOriginal | F:Stock | G:Color | H:Emoji | I:Badge | J:Activo | K:Descripcion | L:ImageURL | M:Descuento | N:Cuotas
+// Sheet "Productos" columns: A:ID | B:Nombre | C:Categoría | D:Precio | E:PrecioOriginal | F:Stock | G:Color | H:Emoji | I:Badge | J:Activo | K:Descripcion | L:ImageURL | M:Descuento | N:Cuotas | O:Talle
 
 async function getProducts() {
   if (!SHEET_ID) throw new Error('GOOGLE_SHEETS_ID no configurado');
@@ -32,7 +32,7 @@ async function getProducts() {
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: 'Productos!A2:N100',
+    range: 'Productos!A2:O500',
   });
 
   const rows = response.data.values || [];
@@ -41,8 +41,9 @@ async function getProducts() {
   rows.forEach((row, i) => {
     console.log(`   Row ${i + 2}: [${row.join(' | ')}]`);
   });
-  return rows
-    .filter(r => r.length >= 2 && r[1]) // Must have at least a name
+
+  const activeRows = rows
+    .filter(r => r.length >= 2 && r[1])
     .filter(r => {
       const activo = (r[9] || '').toString().toLowerCase().trim();
       return activo !== 'no' && activo !== 'false';
@@ -62,7 +63,29 @@ async function getProducts() {
       image:        r[11] && r[11] !== 'null' && r[11] !== '' ? r[11] : null,
       discount:     Number(r[12]) || 0,
       installments: Number(r[13]) || 3,
+      size:         r[14] && r[14] !== 'null' && r[14] !== '' ? r[14].trim() : null,
     }));
+
+  // Group products by name — aggregate sizes
+  const grouped = new Map();
+  for (const row of activeRows) {
+    const key = row.name;
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        ...row,
+        sizes: row.size ? [{ id: row.id, size: row.size, stock: row.stock }] : [],
+        stock: row.stock,
+      });
+    } else {
+      const existing = grouped.get(key);
+      if (row.size) {
+        existing.sizes.push({ id: row.id, size: row.size, stock: row.stock });
+        existing.stock += row.stock; // total stock across all sizes
+      }
+    }
+  }
+
+  return Array.from(grouped.values());
 }
 
 async function addProduct(product) {

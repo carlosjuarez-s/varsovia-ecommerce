@@ -77,7 +77,10 @@ router.post('/create-delivery', async (req, res) => {
     delivery.whatsappUrl = whatsappUrl;
 
     // Save order to Google Sheets "Pedidos"
-    const itemsSummary = (items || []).map(i => `${i.qty}x ${i.name}`).join(', ');
+    const itemsSummary = (items || []).map(i => {
+      const sizeTag = i.size ? ` (${i.size})` : '';
+      return `${i.qty}x ${i.name}${sizeTag}`;
+    }).join(', ');
     const total = (items || []).reduce((sum, i) => sum + (i.price * i.qty), 0) + zone.price;
     try {
       await addOrder({
@@ -121,7 +124,7 @@ router.post('/create-delivery', async (req, res) => {
     console.log('📦 Nuevo pedido de delivery:', delivery.id);
     console.log('   Cliente:', customer.name, '—', customer.phone);
     console.log('   Direccion:', customer.address, '(' + zone.name + ')');
-    console.log('   Items:', items?.map(i => `${i.qty}x ${i.name}`).join(', '));
+    console.log('   Items:', items?.map(i => `${i.qty}x ${i.name}${i.size ? ' (' + i.size + ')' : ''}`).join(', '));
     console.log('   WhatsApp URL:', whatsappUrl);
 
     res.json({
@@ -225,7 +228,10 @@ router.post('/register-client', async (req, res) => {
 
 // ─── Helper: Build WhatsApp URL for store owner ──────────────
 function buildWhatsAppUrl(storePhone, delivery) {
-  const items = delivery.items.map(i => `  • ${i.qty}x ${i.name}`).join('\n');
+  const items = delivery.items.map(i => {
+    const sizeTag = i.size ? ` (${i.size})` : '';
+    return `  • ${i.qty}x ${i.name}${sizeTag}`;
+  }).join('\n');
   const message = [
     `🛍️ *NUEVO PEDIDO — ${delivery.id}*`,
     ``,
