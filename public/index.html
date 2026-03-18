@@ -3303,10 +3303,26 @@
       const shareText = encodeURIComponent(`Mira este producto de Varsovia: ${product.name} - $${product.price.toLocaleString('es-AR')}\n${productUrl}`);
       document.getElementById('pd-share-wsp').href = `https://wa.me/?text=${shareText}`;
 
-      // Related products (same category, exclude current)
-      const related = (window._allProducts || [])
-        .filter(p => p.category === product.category && p.id !== product.id)
-        .slice(0, 4);
+      // Related products — prioritize: same category + shared colors/sizes, then same category
+      const allOthers = (window._allProducts || []).filter(p => p.id !== product.id);
+      const curColors = (product.colors || []).map(c => c.name);
+      const curSizes = (product.sizes || []).map(s => s.size);
+
+      const scored = allOthers.map(p => {
+        let score = 0;
+        if (p.category === product.category) score += 10;
+        const pColors = (p.colors || []).map(c => c.name);
+        const pSizes = (p.sizes || []).map(s => s.size);
+        score += pColors.filter(c => curColors.includes(c)).length * 2;
+        score += pSizes.filter(s => curSizes.includes(s)).length;
+        return { product: p, score };
+      });
+
+      const related = scored
+        .filter(s => s.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .map(s => s.product);
 
       const relGrid = document.getElementById('pd-related-grid');
       if (related.length > 0) {
