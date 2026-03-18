@@ -36,6 +36,77 @@
       overflow-x: hidden;
     }
 
+    /* ─── Loading Screen ──────────────────────────────── */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loading-screen .ls-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--pink-600);
+      letter-spacing: 0.06em;
+      margin-bottom: 1.5rem;
+    }
+
+    .loading-screen .ls-hanger {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1.2rem;
+      animation: swing 1.2s ease-in-out infinite;
+    }
+
+    @keyframes swing {
+      0%, 100% { transform: rotate(-12deg); }
+      50% { transform: rotate(12deg); }
+    }
+
+    .loading-screen .ls-messages {
+      font-size: 0.9rem;
+      color: var(--neutral-600);
+      font-weight: 400;
+      text-align: center;
+      height: 1.4em;
+      overflow: hidden;
+      transition: opacity 0.2s;
+    }
+
+    .loading-screen .ls-dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 1.2rem;
+    }
+
+    .loading-screen .ls-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--pink-300);
+      animation: lsDot 1s ease-in-out infinite;
+    }
+
+    .loading-screen .ls-dot:nth-child(2) { animation-delay: 0.15s; }
+    .loading-screen .ls-dot:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes lsDot {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(1.4); opacity: 1; }
+    }
+
     /* ─── Announcement Bar ────────────────────────────── */
     .announcement-bar {
       background: var(--pink-600);
@@ -817,7 +888,7 @@
     .cart-drawer {
       position: fixed;
       top: 0;
-      right: -450px;
+      right: 0;
       width: 420px;
       max-width: 90vw;
       height: 100vh;
@@ -825,11 +896,12 @@
       z-index: 201;
       display: flex;
       flex-direction: column;
-      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: -8px 0 30px rgba(0,0,0,0.15);
+      transform: translateX(100%);
     }
 
-    .cart-drawer.open { right: 0; }
+    .cart-drawer.open { transform: translateX(0); }
 
     .cart-header {
       padding: 1.5rem;
@@ -1473,6 +1545,25 @@
   </style>
 </head>
 <body>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- LOADING SCREEN                                      -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="loading-screen" id="loading-screen">
+    <div class="ls-logo">VARSOVIA</div>
+    <svg class="ls-hanger" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M32 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z" fill="var(--pink-500)"/>
+      <path d="M32 16v6" stroke="var(--pink-500)" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M32 22 8 44h48L32 22z" stroke="var(--pink-500)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <line x1="8" y1="44" x2="56" y2="44" stroke="var(--pink-500)" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div class="ls-messages" id="ls-message">Ordenando el armario...</div>
+    <div class="ls-dots">
+      <div class="ls-dot"></div>
+      <div class="ls-dot"></div>
+      <div class="ls-dot"></div>
+    </div>
+  </div>
 
   <!-- ═══════════════════════════════════════════════════ -->
   <!-- ANNOUNCEMENT BAR                                    -->
@@ -2459,9 +2550,11 @@
         renderCategories(data.products);
         populateNavDropdowns(data.products);
         renderProducts(data.products);
+        hideLoadingScreen();
       } catch (err) {
         document.getElementById('products-grid').innerHTML =
           '<div class="loading"><p>Error cargando productos. Verifica la conexion.</p></div>';
+        hideLoadingScreen();
       }
     }
 
@@ -2644,6 +2737,34 @@
 
       btn.disabled = false;
       btn.textContent = 'Unirme a Varsovia Girl';
+    }
+
+    // ═══════════════════════════════════════════════════
+    // LOADING SCREEN
+    // ═══════════════════════════════════════════════════
+    const loadingMessages = [
+      'Ordenando el armario...',
+      'Preparando tu ropa...',
+      'Eligiendo los mejores looks...',
+      'Planchando las novedades...',
+      'Casi listo, un toque mas...'
+    ];
+    let lsMsgIndex = 0;
+    const lsMsgEl = document.getElementById('ls-message');
+    const lsMsgInterval = setInterval(() => {
+      lsMsgIndex = (lsMsgIndex + 1) % loadingMessages.length;
+      lsMsgEl.style.opacity = '0';
+      setTimeout(() => {
+        lsMsgEl.textContent = loadingMessages[lsMsgIndex];
+        lsMsgEl.style.opacity = '1';
+      }, 200);
+    }, 2000);
+
+    function hideLoadingScreen() {
+      clearInterval(lsMsgInterval);
+      const ls = document.getElementById('loading-screen');
+      ls.classList.add('hidden');
+      setTimeout(() => ls.remove(), 600);
     }
 
     // ─── Init ───────────────────────────────────────────
